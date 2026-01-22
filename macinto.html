@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toile de Résonance - Prototype</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #14141f;
+            --bg-card-hover: #1a1a2e;
+            --accent-gold: #d4a855;
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --border-subtle: rgba(255,255,255,0.08);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-tab {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+
+        .nav-tab.active {
+            background: var(--gradient-1);
+            color: white;
+        }
+
+        /* Main Content */
+        .main {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        .view {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===================== */
+        /* VIEW 1: COMMENTAIRES  */
+        /* ===================== */
+        .comments-view {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .film-header {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .film-poster {
+            width: 200px;
+            height: 300px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .film-info {
+            flex: 1;
+        }
+
+        .film-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .film-meta {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .film-global-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.03);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Comment Card */
+        .comment-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-subtle);
+            transition: all 0.3s ease;
+        }
+
+        .comment-card:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .comment-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .user-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .comment-text {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* Analysis Panel */
+        .analysis-panel {
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: grid;
+            grid-template-columns: 180px 1fr 200px;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        /* Mini Radar */
+        .mini-radar-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+
+        .mini-radar-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Profile Tags */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .profile-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .profile-tag-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .profile-tag-name {
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        .profile-tag-percent {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Resonance Bars */
+        .resonance-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .resonance-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .resonance-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            width: 70px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .resonance-track {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .resonance-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .resonance-value {
+            font-size: 0.8rem;
+            font-weight: 600;
+            width: 30px;
+            text-align: right;
+        }
+
+        /* ===================== */
+        /* VIEW 2: MON PASSEPORT */
+        /* ===================== */
+        .passport-view {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .passport-card {
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 1px solid rgba(212, 168, 85, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .passport-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(212, 168, 85, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .passport-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .passport-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .passport-film-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .passport-film-meta {
+            color: var(--text-secondary);
+        }
+
+        .passport-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .passport-section {
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .passport-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Big Radar */
+        .radar-container {
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        /* Profile Donut */
+        .donut-container {
+            width: 100%;
+            max-width: 220px;
+            margin: 0 auto;
+        }
+
+        /* Thermometer */
+        .thermometer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .thermo-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .thermo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .thermo-info {
+            flex: 1;
+        }
+
+        .thermo-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .thermo-bar-track {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 0.3rem;
+            overflow: hidden;
+        }
+
+        .thermo-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .thermo-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Keywords */
+        .keywords-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .keyword-tag {
+            padding: 0.5rem 1rem;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--accent-purple);
+        }
+
+        /* ===================== */
+        /* VIEW 3: MA COLLECTION */
+        /* ===================== */
+        .collection-view {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .collection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .collection-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+        }
+
+        .collection-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .collection-stat {
+            text-align: center;
+        }
+
+        .collection-stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .collection-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Film Grid */
+        .film-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .film-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .film-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .film-card:hover .film-card-overlay {
+            opacity: 1;
+        }
+
+        .film-card-poster {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            display: block;
+        }
+
+        .film-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1rem;
+        }
+
+        .film-card-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .film-card-mini-stats {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .mini-stat {
+            padding: 0.25rem 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        /* ===================== */
+        /* VIEW 4: RÉDIGER AVIS  */
+        /* ===================== */
+        .write-view {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .write-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .write-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .write-subtitle {
+            color: var(--text-secondary);
+        }
+
+        .write-form {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-textarea {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+        }
+
+        /* Sliders */
+        .criteria-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .criteria-item {
+            background: rgba(255,255,255,0.02);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .criteria-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .criteria-name {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .criteria-value {
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .criteria-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .criteria-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+        }
+
+        .criteria-description {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        /* ===================== */
+        /* VIEW 5: RÉTROSPECTIVE */
+        /* ===================== */
+        .retro-view {
+            padding: 2rem;
+        }
+
+        .retro-hero {
+            max-width: 900px;
+            margin: 0 auto 3rem;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(145deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .retro-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+        }
+
+        .retro-year {
+            font-size: 6rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .retro-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .retro-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .retro-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-subtle);
+            text-align: center;
+        }
+
+        .retro-card.featured {
+            grid-column: span 2;
+            grid-row: span 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .retro-card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .retro-card-value {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .retro-card-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .retro-profile-badge {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--gradient-1);
+            border-radius: 30px;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .analysis-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .passport-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .criteria-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .retro-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .retro-card.featured {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-logo">Toile de Résonance</div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-view="comments">💬 Commentaires</button>
+            <button class="nav-tab" data-view="passport">🎫 Mon Passeport</button>
+            <button class="nav-tab" data-view="collection">🎬 Ma Collection</button>
+            <button class="nav-tab" data-view="write">✍️ Rédiger</button>
+            <button class="nav-tab" data-view="retro">✨ Rétrospective</button>
+        </div>
+    </nav>
+
+    <main class="main">
+        <!-- VIEW 1: Commentaires -->
+        <div class="view active" id="comments">
+            <div class="comments-view">
+                <!-- Film Header -->
+                <div class="film-header">
+                    <img src="https://image.tmdb.org/t/p/w500/5S9eTJyDqFdLQ5dBqIDdHSVVKjB.jpg" alt="Mulholland Drive" class="film-poster">
+                    <div class="film-info">
+                        <h1 class="film-title">Mulholland Drive</h1>
+                        <p class="film-meta">David Lynch • 2001 • 2h27</p>
+                        <div class="film-global-stats">
+                            <div class="stat-box">
+                                <div class="stat-value">847</div>
+                                <div class="stat-label">Analyses</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">72%</div>
+                                <div class="stat-label">Contemplatifs</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">89</div>
+                                <div class="stat-label">Résonance moy.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comment 1 -->
+                <div class="comment-card">
+                    <div class="comment-header">
+                        <div class="comment-user">
+                            <div class="user-avatar">M</div>
+                            <div>
+                                <div class="user-name">Marie_Cinephile</div>
+                                <div class="user-date">Il y a 3 jours</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="comment-text">
+                        "Une musique envoûtante et une voiture qui s'enfonce mystérieusement dans la nuit, je suis très vite fasciné et happé par cette atmosphère si particulière. Me taire pour ne pas forcément chercher à tout expliquer, me taire et accepter d'avoir dû lâcher prise pour me laisser transpercé, foudroyé, secoué par cette œuvre qui ne ressemblait à rien d'autre que je connaissais."
+                    </p>
+                    <div class="analysis-panel">
+                        <div>
+                            <div class="mini-radar-container">
+                                <canvas id="radar1"></canvas>
+                            </div>
+                            <div class="mini-radar-label">Radar P/R/C</div>
+                        </div>
+                        <div class="profile-section">
+                            <div class="profile-tag">
+                                <div class="profile-tag-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">🌙</div>
+                                <span class="profile-tag-name">Contemplatif Poétique</span>
+                                <span class="profile-tag-percent" style="color: var(--accent-purple);">78%</span>
+                            </div>
+                            <div class="profile-tag">
+                                <div class="profile-tag-icon" style="background: linear-gradient(135deg, #ec4899, #f472b6);">⚡</div>
+                                <span class="profile-tag-name">Spectateur Saisi</span>
+                                <span class="profile-tag-percent" style="color: var(--accent-pink);">65%</span>
+                            </div>
+                            <div class="profile-tag">
+                                <div class="profile-tag-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">🔮</div>
+                                <span class="profile-tag-name">Fasciné Embrumé</span>
+                                <span class="profile-tag-percent" style="color: var(--accent-blue);">42%</span>
+                            </div>
+                        </div>
+                        <div class="resonance-section">
+                            <div class="resonance-bar">
+                                <span class="resonance-label">Perceptif</span>
+                                <div class="resonance-track">
+                                    <div class="resonance-fill" style="width: 85%; background: var(--gradient-1);"></div>
+                                </div>
+                                <span class="resonance-value">85</span>
+                            </div>
+                            <div class="resonance-bar">
+                                <span class="resonance-label">Rationnel</span>
+                                <div class="resonance-track">
+                                    <div class="resonance-fill" style="width: 25%; background: var(--gradient-2);"></div>
+                                </div>
+                                <span class="resonance-value">25</span>
+                            </div>
+                            <div class="resonance-bar">
+                                <span class="resonance-label">Conceptuel</span>
+                                <div class="resonance-track">
+                                    <div class="resonance-fill" style="width: 45%; background: var(--gradient-3);"></div>
+                                </div>
+                                <span class="resonance-value">45</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comment 2 -->
+                <div class="comment-card">
+                    <div class="comment-header">
+                        <div class="comment-user">
+                            <div class="user-avatar" style="background: var(--gradient-3);">T</div>
+                            <div>
+                                <div class="user-name">TechCinema_42</div>
+                                <div class="user-date">Il y a 1 semaine</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="comment-text">
+                        "L'ouverture en plan-séquence est impressionnante, et l'utilisation des ombres apporte une vraie atmosphère. La structure en rêve vs réalité brouille volontairement la distinction entre ces deux états. Le montage non linéaire rend le récit intentionnellement difficile à suivre, démontrable par des comparaisons avec d'autres scènes du film."
+                    </p>
+                    <div class="analysis-panel">
+                        <div>
+                            <div class="mini-radar-container">
+                                <canvas id="radar2"></canvas>
+                            </div>
+                            <div class="mini-radar-label">Radar P/R/C</div>
+                        </div>
+                        <div class="profile-section">
+                            <div class="profile-tag">
+                                <div class="profile-tag-icon" style="background: linear-gradient(135deg, #10b981, #34d399);">🎬</div>
+                                <span class="profile-tag-name">Technicien Nuancé</span>
+                                <span class="profile-tag-percent" style="color: var(--accent-green);">82%</span>
+                            </div>
+                            <div class="profile-tag">
+                                <div class="profile-tag-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">📖</div>
+                                <span class="profile-tag-name">Anatomiste Narratif</span>
+                                <span class="profile-tag-percent" style="color: var(--accent-orange);">58%</span>
+                            </div>
+                        </div>
+                        <div class="resonance-section">
+                            <div class="resonance-bar">
+                                <span class="resonance-label">Perceptif</span>
+                                <div class="resonance-track">
+                                    <div class="resonance-fill" style="width: 70%; background: var(--gradient-1);"></div>
+                                </div>
+                                <span class="resonance-value">70</span>
+                            </div>
+                            <div class="resonance-bar">
+                                <span class="resonance-label">Rationnel</span>
+                                <div class="resonance-track">
+                                    <div class="resonance-fill" style="width: 90%; background: var(--gradient-2);"></div>
+                                </div>
+                                <span class="resonance-value">90</span>
+                            </div>
+                            <div class="resonance-bar">
+                                <span class="resonance-label">Conceptuel</span>
+                                <div class="resonance-track">
+                                    <div class="resonance-fill" style="width: 55%; background: var(--gradient-3);"></div>
+                                </div>
+                                <span class="resonance-value">55</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comment 3 - Negative/Impulsif -->
+                <div class="comment-card">
+                    <div class="comment-header">
+                        <div class="comment-user">
+                            <div class="user-avatar" style="background: linear-gradient(135deg, #ef4444, #f87171);">X</div>
+                            <div>
+                                <div class="user-name">Xavier_Movies</div>
+                                <div class="user-date">Il y a 2 semaines</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="comment-text">
+                        "Incompréhensible et irrationnel!!!! Il doit falloir avoir pris une bonne douzaine de champignons hallucinogènes pour comprendre ne serait-ce qu'une minute de ce grand n'importe quoi qu'on appelle un chef d'œuvre!! Le film est complètement incompréhensible la première fois et je ne compte pas le regarder plusieurs fois."
+                    </p>
+                    <div class="analysis-panel">
+                        <div>
+                            <div class="mini-radar-container">
+                                <canvas id="radar3"></canvas>
+                            </div>
+                            <div class="mini-radar-label">Radar P/R/C</div>
+                        </div>
+                        <div class="profile-section">
+                            <div class="profile-tag">
+                                <div class="profile-tag-icon" style="background: linear-gradient(135deg, #ef4444, #f87171);">💢</div>
+                                <span class="profile-tag-name">Détracteur Impulsif</span>
+                                <span class="profile-tag-percent" style="color: #ef4444;">91%</span>
+                            </div>
+                            <div class="profile-tag">
+                                <div class="profile-tag-icon" style="background: linear-gradient(135deg, #6b7280, #9ca3af);">😤</div>
+                                <span class="profile-tag-name">L'Impatient</span>
+                                <span class="profile-tag-percent" style="color: #9ca3af;">67%</span>
+                            </div>
+                        </div>
+                        <div class="resonance-section">
+                            <div class="resonance-bar">
+                                <span class="resonance-label">Perceptif</span>
+                                <div class="resonance-track">
+                                    <div class="resonance-fill" style="width: 15%; background: var(--gradient-1);"></div>
+                                </div>
+                                <span class="resonance-value">15</span>
+                            </div>
+                            <div class="resonance-bar">
+                                <span class="resonance-label">Rationnel</span>
+                                <div class="resonance-track">
+                                    <div class="resonance-fill" style="width: 8%; background: var(--gradient-2);"></div>
+                                </div>
+                                <span class="resonance-value">8</span>
+                            </div>
+                            <div class="resonance-bar">
+                                <span class="resonance-label">Conceptuel</span>
+                                <div class="resonance-track">
+                                    <div class="resonance-fill" style="width: 5%; background: var(--gradient-3);"></div>
+                                </div>
+                                <span class="resonance-value">5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: Mon Passeport -->
+        <div class="view" id="passport">
+            <div class="passport-view">
+                <div class="passport-card">
+                    <div class="passport-header">
+                        <div class="passport-title">Passeport de Résonance</div>
+                        <h2 class="passport-film-title">AFTERSUN</h2>
+                        <p class="passport-film-meta">Charlotte Wells • 2022 • Mon avis du 15 janvier 2024</p>
+                    </div>
+
+                    <div class="passport-grid">
+                        <!-- Radar Section -->
+                        <div class="passport-section">
+                            <div class="passport-section-title">
+                                <span>📊</span> Radar P/R/C
+                            </div>
+                            <div class="radar-container">
+                                <canvas id="passportRadar"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Profile Donut -->
+                        <div class="passport-section">
+                            <div class="passport-section-title">
+                                <span>👤</span> Profil Spectateur
+                            </div>
+                            <div class="donut-container">
+                                <canvas id="passportDonut"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Thermometer -->
+                        <div class="passport-section">
+                            <div class="passport-section-title">
+                                <span>🔥</span> Thermomètre de Résonance
+                            </div>
+                            <div class="thermometer-list">
+                                <div class="thermo-item">
+                                    <div class="thermo-icon" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">⚡</div>
+                                    <div class="thermo-info">
+                                        <div class="thermo-label">Impact Immédiat</div>
+                                        <div class="thermo-bar-track">
+                                            <div class="thermo-bar-fill" style="width: 83%; background: linear-gradient(90deg, #ef4444, #f87171);"></div>
+                                        </div>
+                                    </div>
+                                    <div class="thermo-value" style="color: #ef4444;">83</div>
+                                </div>
+                                <div class="thermo-item">
+                                    <div class="thermo-icon" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">🌊</div>
+                                    <div class="thermo-info">
+                                        <div class="thermo-label">Impact Différé</div>
+                                        <div class="thermo-bar-track">
+                                            <div class="thermo-bar-fill" style="width: 92%; background: linear-gradient(90deg, #8b5cf6, #a78bfa);"></div>
+                                        </div>
+                                    </div>
+                                    <div class="thermo-value" style="color: #8b5cf6;">92</div>
+                                </div>
+                                <div class="thermo-item">
+                                    <div class="thermo-icon" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">🔮</div>
+                                    <div class="thermo-info">
+                                        <div class="thermo-label">Curiosité Relancée</div>
+                                        <div class="thermo-bar-track">
+                                            <div class="thermo-bar-fill" style="width: 78%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                                        </div>
+                                    </div>
+                                    <div class="thermo-value" style="color: #10b981;">78</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Keywords -->
+                        <div class="passport-section">
+                            <div class="passport-section-title">
+                                <span>💭</span> Mots-Empreintes
+                            </div>
+                            <div class="keywords-container">
+                                <span class="keyword-tag">lumière saltique</span>
+                                <span class="keyword-tag">absence ajourée</span>
+                                <span class="keyword-tag">caméscope fantôme</span>
+                                <span class="keyword-tag">mélancolie solaire</span>
+                                <span class="keyword-tag">mémoire fragmentée</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: Ma Collection -->
+        <div class="view" id="collection">
+            <div class="collection-view">
+                <div class="collection-header">
+                    <h1 class="collection-title">Ma Collection</h1>
+                    <div class="collection-stats">
+                        <div class="collection-stat">
+                            <div class="collection-stat-value">127</div>
+                            <div class="collection-stat-label">Films vus</div>
+                        </div>
+                        <div class="collection-stat">
+                            <div class="collection-stat-value">84</div>
+                            <div class="collection-stat-label">Résonance moy.</div>
+                        </div>
+                        <div class="collection-stat">
+                            <div class="collection-stat-value">68%</div>
+                            <div class="collection-stat-label">Contemplatif</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="film-grid">
+                    <div class="film-card">
+                        <img src="https://image.tmdb.org/t/p/w500/5S9eTJyDqFdLQ5dBqIDdHSVVKjB.jpg" class="film-card-poster" alt="Mulholland Drive">
+                        <div class="film-card-overlay">
+                            <div class="film-card-title">Mulholland Drive</div>
+                            <div class="film-card-mini-stats">
+                                <span class="mini-stat">P:85</span>
+                                <span class="mini-stat">R:45</span>
+                                <span class="mini-stat">C:72</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="film-card">
+                        <img src="https://image.tmdb.org/t/p/w500/aGM7VwBLAcMFYq6UwLf8OEkwOkY.jpg" class="film-card-poster" alt="Aftersun">
+                        <div class="film-card-overlay">
+                            <div class="film-card-title">Aftersun</div>
+                            <div class="film-card-mini-stats">
+                                <span class="mini-stat">P:88</span>
+                                <span class="mini-stat">R:35</span>
+                                <span class="mini-stat">C:65</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="film-card">
+                        <img src="https://image.tmdb.org/t/p/w500/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg" class="film-card-poster" alt="Interstellar">
+                        <div class="film-card-overlay">
+                            <div class="film-card-title">Interstellar</div>
+                            <div class="film-card-mini-stats">
+                                <span class="mini-stat">P:92</span>
+                                <span class="mini-stat">R:78</span>
+                                <span class="mini-stat">C:85</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="film-card">
+                        <img src="https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg" class="film-card-poster" alt="Joker">
+                        <div class="film-card-overlay">
+                            <div class="film-card-title">Joker</div>
+                            <div class="film-card-mini-stats">
+                                <span class="mini-stat">P:75</span>
+                                <span class="mini-stat">R:68</span>
+                                <span class="mini-stat">C:82</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="film-card">
+                        <img src="https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg" class="film-card-poster" alt="The Shining">
+                        <div class="film-card-overlay">
+                            <div class="film-card-title">The Shining</div>
+                            <div class="film-card-mini-stats">
+                                <span class="mini-stat">P:90</span>
+                                <span class="mini-stat">R:55</span>
+                                <span class="mini-stat">C:78</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="film-card">
+                        <img src="https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg" class="film-card-poster" alt="2001">
+                        <div class="film-card-overlay">
+                            <div class="film-card-title">2001: L'Odyssée</div>
+                            <div class="film-card-mini-stats">
+                                <span class="mini-stat">P:95</span>
+                                <span class="mini-stat">R:42</span>
+                                <span class="mini-stat">C:98</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: Rédiger -->
+        <div class="view" id="write">
+            <div class="write-view">
+                <div class="write-header">
+                    <h1 class="write-title">Créer mon Passeport</h1>
+                    <p class="write-subtitle">Analysez votre ressenti selon les critères de résonance</p>
+                </div>
+
+                <div class="write-form">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <span>✍️</span> Votre ressenti libre
+                        </div>
+                        <textarea class="form-textarea" placeholder="Décrivez votre expérience du film... Qu'avez-vous ressenti ? Qu'est-ce qui vous a marqué ?"></textarea>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <span>📊</span> Critères de résonance
+                        </div>
+                        <div class="criteria-grid">
+                            <div class="criteria-item">
+                                <div class="criteria-header">
+                                    <span class="criteria-name">Immersion sensorielle</span>
+                                    <span class="criteria-value" id="val-immersion">75</span>
+                                </div>
+                                <input type="range" class="criteria-slider" min="0" max="100" value="75" data-target="val-immersion">
+                                <p class="criteria-description">La captation de vos sens par l'image, le son, l'atmosphère</p>
+                            </div>
+                            <div class="criteria-item">
+                                <div class="criteria-header">
+                                    <span class="criteria-name">Impact immédiat</span>
+                                    <span class="criteria-value" id="val-impact">60</span>
+                                </div>
+                                <input type="range" class="criteria-slider" min="0" max="100" value="60" data-target="val-impact">
+                                <p class="criteria-description">L'émotion ressentie pendant le visionnage</p>
+                            </div>
+                            <div class="criteria-item">
+                                <div class="criteria-header">
+                                    <span class="criteria-name">Impact différé</span>
+                                    <span class="criteria-value" id="val-differe">85</span>
+                                </div>
+                                <input type="range" class="criteria-slider" min="0" max="100" value="85" data-target="val-differe">
+                                <p class="criteria-description">Ce qui reste après, ce qui continue de travailler</p>
+                            </div>
+                            <div class="criteria-item">
+                                <div class="criteria-header">
+                                    <span class="criteria-name">Curiosité relancée</span>
+                                    <span class="criteria-value" id="val-curiosite">70</span>
+                                </div>
+                                <input type="range" class="criteria-slider" min="0" max="100" value="70" data-target="val-curiosite">
+                                <p class="criteria-description">L'envie d'explorer plus loin (revoir, analyser, découvrir l'auteur...)</p>
+                            </div>
+                            <div class="criteria-item">
+                                <div class="criteria-header">
+                                    <span class="criteria-name">Polysémie perçue</span>
+                                    <span class="criteria-value" id="val-polysemie">55</span>
+                                </div>
+                                <input type="range" class="criteria-slider" min="0" max="100" value="55" data-target="val-polysemie">
+                                <p class="criteria-description">Richesse des interprétations possibles</p>
+                            </div>
+                            <div class="criteria-item">
+                                <div class="criteria-header">
+                                    <span class="criteria-name">Transformation</span>
+                                    <span class="criteria-value" id="val-transform">40</span>
+                                </div>
+                                <input type="range" class="criteria-slider" min="0" max="100" value="40" data-target="val-transform">
+                                <p class="criteria-description">Ce que le film a changé en vous ou dans votre vision</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="submit-btn">Générer mon Passeport de Résonance ✨</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 5: Rétrospective -->
+        <div class="view" id="retro">
+            <div class="retro-view">
+                <div class="retro-hero">
+                    <div class="retro-year">2024</div>
+                    <p class="retro-subtitle">Votre année cinématographique</p>
+                </div>
+
+                <div class="retro-grid">
+                    <div class="retro-card featured">
+                        <div class="retro-card-icon">🎭</div>
+                        <div class="retro-card-value">Contemplatif Poétique</div>
+                        <div class="retro-card-label">Votre profil dominant cette année</div>
+                        <div class="retro-profile-badge">72% de vos analyses</div>
+                    </div>
+                    <div class="retro-card">
+                        <div class="retro-card-icon">🎬</div>
+                        <div class="retro-card-value">127</div>
+                        <div class="retro-card-label">Films vus</div>
+                    </div>
+                    <div class="retro-card">
+                        <div class="retro-card-icon">⏱️</div>
+                        <div class="retro-card-value">254h</div>
+                        <div class="retro-card-label">Heures de visionnage</div>
+                    </div>
+                    <div class="retro-card">
+                        <div class="retro-card-icon">🌊</div>
+                        <div class="retro-card-value">84</div>
+                        <div class="retro-card-label">Résonance moyenne</div>
+                    </div>
+                    <div class="retro-card">
+                        <div class="retro-card-icon">🔮</div>
+                        <div class="retro-card-value">67%</div>
+                        <div class="retro-card-label">Impact différé > immédiat</div>
+                    </div>
+                    <div class="retro-card">
+                        <div class="retro-card-icon">🎯</div>
+                        <div class="retro-card-value">David Lynch</div>
+                        <div class="retro-card-label">Réalisateur le plus exploré</div>
+                    </div>
+                    <div class="retro-card">
+                        <div class="retro-card-icon">💫</div>
+                        <div class="retro-card-value">Aftersun</div>
+                        <div class="retro-card-label">Plus haute résonance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.view).classList.add('active');
+            });
+        });
+
+        // Sliders
+        document.querySelectorAll('.criteria-slider').forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                document.getElementById(e.target.dataset.target).textContent = e.target.value;
+            });
+        });
+
+        // Chart.js Configuration
+        Chart.defaults.color = '#a0a0b0';
+        Chart.defaults.font.family = 'Inter';
+
+        // Mini Radar 1 - Contemplatif
+        new Chart(document.getElementById('radar1'), {
+            type: 'radar',
+            data: {
+                labels: ['Perceptif', 'Rationnel', 'Conceptuel'],
+                datasets: [{
+                    data: [85, 25, 45],
+                    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                    borderColor: 'rgba(139, 92, 246, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(139, 92, 246, 1)',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { display: false, stepSize: 25 },
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        angleLines: { color: 'rgba(255,255,255,0.1)' },
+                        pointLabels: { font: { size: 10 } }
+                    }
+                }
+            }
+        });
+
+        // Mini Radar 2 - Technicien
+        new Chart(document.getElementById('radar2'), {
+            type: 'radar',
+            data: {
+                labels: ['Perceptif', 'Rationnel', 'Conceptuel'],
+                datasets: [{
+                    data: [70, 90, 55],
+                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { display: false, stepSize: 25 },
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        angleLines: { color: 'rgba(255,255,255,0.1)' },
+                        pointLabels: { font: { size: 10 } }
+                    }
+                }
+            }
+        });
+
+        // Mini Radar 3 - Détracteur
+        new Chart(document.getElementById('radar3'), {
+            type: 'radar',
+            data: {
+                labels: ['Perceptif', 'Rationnel', 'Conceptuel'],
+                datasets: [{
+                    data: [15, 8, 5],
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { display: false, stepSize: 25 },
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        angleLines: { color: 'rgba(255,255,255,0.1)' },
+                        pointLabels: { font: { size: 10 } }
+                    }
+                }
+            }
+        });
+
+        // Passport Radar
+        new Chart(document.getElementById('passportRadar'), {
+            type: 'radar',
+            data: {
+                labels: ['Perceptif', 'Rationnel', 'Conceptuel'],
+                datasets: [{
+                    data: [88, 35, 65],
+                    backgroundColor: 'rgba(212, 168, 85, 0.2)',
+                    borderColor: 'rgba(212, 168, 85, 1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: 'rgba(212, 168, 85, 1)',
+                    pointRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { display: false, stepSize: 25 },
+                        grid: { color: 'rgba(255,255,255,0.15)' },
+                        angleLines: { color: 'rgba(255,255,255,0.15)' },
+                        pointLabels: { font: { size: 12, weight: '500' } }
+                    }
+                }
+            }
+        });
+
+        // Passport Donut
+        new Chart(document.getElementById('passportDonut'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Contemplatif', 'Saisi', 'Technicien'],
+                datasets: [{
+                    data: [70, 25, 15],
+                    backgroundColor: [
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(236, 72, 153, 0.8)',
+                        'rgba(16, 185, 129, 0.8)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
