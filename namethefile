@@ -1,0 +1,1746 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prototype — Profils & Résonance (P/R/C)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --ink:#12131a;
+      --muted:#5c606b;
+      --muted2:#7c8190;
+
+      --card:#ffffff;
+      --line:#e7e9ef;
+      --line2:#d8dbe6;
+
+      --accent:#1f6f63;      /* vert profond */
+      --accent2:#273c86;     /* bleu marine */
+      --lime:#c8d223;
+
+      --shadow: 0 12px 28px rgba(16,24,40,.08);
+      --shadow2: 0 6px 16px rgba(16,24,40,.06);
+
+      --r: 22px;
+      --r2: 16px;
+
+      --p:#2f7ae5;   /* Perceptif */
+      --rr:#6a6ee8;  /* Rationnel */
+      --c:#f06b2d;   /* Conceptuel */
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:"DM Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      overflow-x:hidden;
+    }
+
+    /* Layout */
+    .app{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:rgba(255,255,255,.86);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:260px;
+    }
+
+    .brand-badge{
+      width:42px;height:42px;border-radius:12px;
+      background:linear-gradient(135deg, var(--lime), #a7b21e);
+      display:grid;place-items:center;
+      box-shadow:0 10px 18px rgba(200,210,35,.25);
+      font-weight:800;
+    }
+    .brand h1{
+      margin:0;
+      font-family:"Playfair Display", serif;
+      font-size:1.05rem;
+      letter-spacing:.2px;
+    }
+    .brand p{
+      margin:2px 0 0 0;
+      font-size:.82rem;
+      color:var(--muted);
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      box-shadow:var(--shadow2);
+      flex:1;
+      justify-content:center;
+    }
+
+    .tab{
+      border:0;
+      background:transparent;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:650;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:8px;
+      transition: background .15s ease, color .15s ease, transform .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .tab:hover{ background:#f4f6fb; color:#2b2f3a; }
+    .tab[aria-selected="true"]{
+      background:linear-gradient(135deg, rgba(31,111,99,.14), rgba(39,60,134,.12));
+      color:#101423;
+      box-shadow: inset 0 0 0 1px rgba(31,111,99,.12);
+    }
+
+    .right-meta{
+      min-width:260px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      align-items:center;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      box-shadow:var(--shadow2);
+      color:var(--muted);
+      font-weight:600;
+      font-size:.9rem;
+    }
+    .dot{ width:10px;height:10px;border-radius:999px;background:var(--accent); }
+    .pill strong{ color:var(--ink); }
+
+    main{
+      flex:1;
+      max-width:1200px;
+      width:100%;
+      margin:0 auto;
+      padding:22px 18px 34px;
+    }
+
+    .view{ display:none; }
+    .view.active{ display:block; }
+
+    /* Header section */
+    .hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:18px;
+      margin-bottom:18px;
+    }
+    .hero-title{
+      max-width:760px;
+    }
+    .hero-title h2{
+      margin:0;
+      font-family:"Playfair Display", serif;
+      font-size:2rem;
+      letter-spacing:.2px;
+    }
+    .hero-title p{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:1rem;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      color:#12131a;
+      font-weight:700;
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow:var(--shadow2);
+      transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+      user-select:none;
+    }
+    .btn:hover{ transform:translateY(-1px); box-shadow:0 16px 32px rgba(16,24,40,.10); }
+    .btn.primary{
+      border-color:transparent;
+      background:linear-gradient(135deg, var(--accent), #1a5c52);
+      color:#fff;
+      box-shadow: 0 14px 26px rgba(31,111,99,.18);
+    }
+    .btn.primary:hover{ box-shadow: 0 18px 34px rgba(31,111,99,.22); }
+    .btn.ghost{
+      background:#f6f7fb;
+    }
+
+    /* Cards grid */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.35fr .85fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns:1fr; }
+      .brand{ min-width:auto; }
+      .right-meta{ display:none; }
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card-header{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .card-header h3{
+      margin:0;
+      font-size:1rem;
+      letter-spacing:.2px;
+    }
+    .card-header small{
+      color:var(--muted2);
+      font-weight:600;
+    }
+    .card-body{ padding:16px; }
+
+    /* Quick stats strip */
+    .quick{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      padding:12px 14px;
+      border-radius:16px;
+      background:linear-gradient(135deg, rgba(39,60,134,.06), rgba(31,111,99,.06));
+      border:1px solid rgba(39,60,134,.10);
+    }
+    .quick strong{ font-size:1.05rem; }
+    .quick span{ color:var(--muted); font-weight:650; }
+    .quick .mini{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      color:var(--muted); font-weight:650;
+    }
+    .mini-badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:999px;
+      box-shadow:var(--shadow2);
+      font-size:.9rem;
+    }
+    .mini-badge em{ font-style:normal; color:var(--ink); }
+
+    /* Comment cards */
+    .comment{
+      display:flex;
+      gap:14px;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+    }
+    .comment + .comment{ margin-top:12px; }
+
+    .avatar{
+      width:46px;height:46px;border-radius:16px;
+      display:grid; place-items:center;
+      font-weight:800;
+      color:#0b0d14;
+      border:1px solid var(--line);
+      background:linear-gradient(135deg, rgba(200,210,35,.40), rgba(39,60,134,.18));
+      flex:0 0 auto;
+    }
+
+    .comment-main{ flex:1; min-width:0; }
+    .comment-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .comment-top h4{
+      margin:0;
+      font-size:1rem;
+      letter-spacing:.2px;
+    }
+    .comment-top small{ color:var(--muted2); font-weight:650; }
+
+    .comment-text{
+      margin:10px 0 12px;
+      color:#2b2f3a;
+      line-height:1.55;
+    }
+
+    /* Collapsed row */
+    .collapsed-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      background:#fafbfe;
+      border:1px solid var(--line);
+    }
+
+    .prc{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      font-weight:750;
+      color:#1b1f2c;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow2);
+      font-size:.9rem;
+    }
+    .swatch{ width:10px;height:10px;border-radius:999px; }
+    .swatch.p{ background:var(--p); }
+    .swatch.r{ background:var(--rr); }
+    .swatch.c{ background:var(--c); }
+
+    /* profile badge */
+    .profile-badge{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:750;
+      color:var(--muted);
+    }
+    .profile-icon{
+      width:34px;height:34px;border-radius:14px;
+      display:grid;place-items:center;
+      border:1px solid var(--line);
+      background:#fff;
+      box-shadow:var(--shadow2);
+      position:relative;
+    }
+    .profile-icon::after{
+      content:"";
+      position:absolute; inset:-1px;
+      border-radius:14px;
+      pointer-events:none;
+      box-shadow: inset 0 0 0 1px rgba(31,111,99,.10);
+    }
+    .profile-icon img{
+      width:22px;height:22px; display:block;
+    }
+
+    /* accordion */
+    .accordion-btn{
+      border:1px solid var(--line);
+      background:#fff;
+      cursor:pointer;
+      font-weight:800;
+      color:#1b1f2c;
+      border-radius:12px;
+      padding:9px 10px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:var(--shadow2);
+      user-select:none;
+    }
+    .accordion-btn:hover{ background:#f6f7fb; }
+    .chev{
+      width:10px;height:10px;
+      border-right:2px solid #3a3f4a;
+      border-bottom:2px solid #3a3f4a;
+      transform: rotate(45deg);
+      transition: transform .15s ease;
+      margin-top:-2px;
+    }
+    .accordion-btn[aria-expanded="true"] .chev{
+      transform: rotate(-135deg);
+      margin-top:2px;
+    }
+
+    .accordion{
+      margin-top:12px;
+      display:none;
+      gap:12px;
+      grid-template-columns: 1.15fr .85fr;
+      align-items:stretch;
+    }
+    .accordion.open{ display:grid; }
+    @media (max-width: 980px){
+      .accordion{ grid-template-columns:1fr; }
+    }
+
+    /* “Perspective web” */
+    .web{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      box-shadow:var(--shadow2);
+      padding:10px;
+      overflow:hidden;
+      position:relative;
+      min-height:220px;
+    }
+    .web .hint{
+      position:absolute;
+      left:12px; top:10px;
+      display:flex; gap:8px; align-items:center;
+      background:rgba(255,255,255,.92);
+      border:1px solid var(--line);
+      padding:7px 10px;
+      border-radius:999px;
+      font-weight:800;
+      color:var(--muted);
+      box-shadow:var(--shadow2);
+      z-index:2;
+    }
+    .web svg{
+      width:100%;
+      height:240px;
+      display:block;
+      transform: perspective(900px) rotateX(14deg);
+      transform-origin: 50% 55%;
+    }
+
+    /* Radar */
+    .radar{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      box-shadow:var(--shadow2);
+      padding:12px;
+    }
+    .radar-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .radar-top strong{ font-size:.98rem; }
+    .radar-top span{ color:var(--muted2); font-weight:700; font-size:.9rem; }
+    .radar svg{ width:100%; height:180px; display:block; }
+    .legend{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-weight:700;
+      font-size:.9rem;
+    }
+
+    /* Criteria list */
+    .criteria{
+      margin-top:12px;
+      border-top:1px dashed var(--line2);
+      padding-top:12px;
+      display:grid;
+      gap:10px;
+    }
+    .criterion{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fafbfe;
+    }
+    .criterion b{ font-size:.95rem; }
+    .bar{
+      flex:1;
+      height:10px;
+      border-radius:999px;
+      background:#edf0f7;
+      overflow:hidden;
+      border:1px solid rgba(16,24,40,.06);
+      max-width:220px;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width:50%;
+      background:linear-gradient(90deg, rgba(31,111,99,.7), rgba(39,60,134,.7));
+      border-radius:999px;
+    }
+    .pct{ font-weight:800; color:#1b1f2c; }
+
+    /* Right column widgets */
+    .side-stack{ display:grid; gap:16px; }
+    .poster{
+      aspect-ratio: 3/4;
+      border-radius:18px;
+      background:linear-gradient(135deg, rgba(39,60,134,.16), rgba(200,210,35,.14));
+      border:1px solid var(--line);
+      box-shadow:var(--shadow2);
+      position:relative;
+      overflow:hidden;
+    }
+    .poster::after{
+      content:"";
+      position:absolute; inset:-60px;
+      background: radial-gradient(circle at 30% 20%, rgba(31,111,99,.22), transparent 55%),
+                  radial-gradient(circle at 70% 80%, rgba(39,60,134,.18), transparent 52%);
+      transform: rotate(10deg);
+    }
+    .poster .label{
+      position:absolute; left:14px; bottom:14px;
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      padding:10px 12px;
+      border-radius:14px;
+      box-shadow:var(--shadow2);
+      font-weight:850;
+      color:#1b1f2c;
+    }
+    .note{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      box-shadow:var(--shadow2);
+      color:var(--muted);
+      line-height:1.45;
+      font-weight:650;
+    }
+    .note b{ color:var(--ink); }
+
+    /* Collection */
+    .collection-grid{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 1100px){ .collection-grid{ grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 720px){ .collection-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+    .tile{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      box-shadow:var(--shadow2);
+      overflow:hidden;
+      cursor:pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .tile:hover{ transform: translateY(-2px); box-shadow:0 18px 36px rgba(16,24,40,.10); }
+    .tile .img{
+      aspect-ratio: 3/4;
+      background:linear-gradient(135deg, rgba(31,111,99,.14), rgba(39,60,134,.14));
+      position:relative;
+      overflow:hidden;
+    }
+    .tile .img::after{
+      content:"";
+      position:absolute; inset:-30px;
+      background: radial-gradient(circle at 30% 30%, rgba(200,210,35,.25), transparent 55%),
+                  radial-gradient(circle at 70% 70%, rgba(39,60,134,.18), transparent 55%);
+      transform: rotate(-6deg);
+    }
+    .tile .meta{
+      padding:10px 10px 12px;
+    }
+    .tile .meta b{ display:block; font-size:.92rem; }
+    .tile .meta small{ color:var(--muted2); font-weight:700; }
+
+    .drawer{
+      margin-top:16px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:#fff;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      display:none;
+    }
+    .drawer.open{ display:block; }
+    .drawer-top{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    .drawer-top h3{ margin:0; }
+    .drawer-body{ padding:16px; }
+
+    /* Write review */
+    .form{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    .field{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      box-shadow:var(--shadow2);
+      padding:14px;
+    }
+    .field-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .field-head b{ font-size:1rem; }
+    .field-head small{ color:var(--muted2); font-weight:700; }
+
+    textarea{
+      width:100%;
+      min-height:88px;
+      resize:vertical;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 12px;
+      font-family:inherit;
+      font-size:.98rem;
+      line-height:1.45;
+      outline:none;
+      background:#fbfcff;
+    }
+    textarea:focus{
+      border-color: rgba(31,111,99,.35);
+      box-shadow: 0 0 0 4px rgba(31,111,99,.10);
+      background:#fff;
+    }
+
+    .range-row{
+      margin-top:10px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    input[type="range"]{ width:100%; }
+    .range-pill{
+      min-width:68px;
+      text-align:center;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      box-shadow:var(--shadow2);
+      font-weight:900;
+      color:#1b1f2c;
+    }
+
+    .error{
+      display:none;
+      margin-top:10px;
+      color:#b42318;
+      font-weight:750;
+    }
+
+    /* Retrospective (simple “toile/compas”) */
+    .compass{
+      padding:16px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:#fff;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .compass svg{
+      width:100%;
+      height:420px;
+      display:block;
+    }
+    .subnote{
+      margin-top:10px;
+      color:var(--muted);
+      line-height:1.55;
+      font-weight:650;
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">◎</div>
+        <div>
+          <h1>Profils & Résonance</h1>
+          <p>Prototype UI — analyse P/R/C + profils + critères</p>
+        </div>
+      </div>
+
+      <nav class="tabs" aria-label="Navigation">
+        <button class="tab" data-tab="comments" aria-selected="true">💬 Commentaires</button>
+        <button class="tab" data-tab="passport" aria-selected="false">🪪 Passeport</button>
+        <button class="tab" data-tab="collection" aria-selected="false">🗂️ Ma collection</button>
+        <button class="tab" data-tab="write" aria-selected="false">✍️ Rédiger</button>
+        <button class="tab" data-tab="retro" aria-selected="false">🧭 Rétrospective</button>
+      </nav>
+
+      <div class="right-meta">
+        <div class="pill"><span class="dot"></span> <strong id="globalCount">847</strong> analyses</div>
+        <div class="pill"><strong id="globalRes">Résonance</strong> <span id="globalResVal">64%</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- COMMENTS -->
+    <section class="view active" id="view-comments">
+      <div class="hero">
+        <div class="hero-title">
+          <h2>Espace commentaires</h2>
+          <p>
+            Chaque avis affiche le texte complet. Le module de lecture (P/R/C, profil principal, radar, critères) est replié par défaut et se déplie à la demande.
+            La “toile de sens” est une vue synthétique qui donne une perspective des tensions (sans fond décoratif).
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn ghost" id="toggleAll">Tout déplier / replier</button>
+          <button class="btn primary" id="jumpWrite">Écrire mon analyse</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-header">
+            <h3>Le film : <span style="color:var(--accent2);font-weight:850">“Exemple — Film A”</span></h3>
+            <small>Récap rapide</small>
+          </div>
+          <div class="card-body">
+            <div class="quick">
+              <div>
+                <strong>847 analyses</strong>
+                <div style="margin-top:6px;color:var(--muted);font-weight:650">
+                  72% Contemplatifs • Résonance moyenne : <span style="color:var(--ink);font-weight:850">64%</span>
+                </div>
+              </div>
+              <div class="mini">
+                <span class="mini-badge"><span class="swatch p"></span> P <em>41%</em></span>
+                <span class="mini-badge"><span class="swatch r"></span> R <em>22%</em></span>
+                <span class="mini-badge"><span class="swatch c"></span> C <em>37%</em></span>
+              </div>
+            </div>
+
+            <div style="height:14px"></div>
+
+            <!-- Comment 1 -->
+            <article class="comment" data-comment>
+              <div class="avatar" title="Alice Marchand">AM</div>
+
+              <div class="comment-main">
+                <div class="comment-top">
+                  <div>
+                    <h4>Alice Marchand</h4>
+                    <small>Analyse publiée • 3 min</small>
+                  </div>
+                  <small style="text-align:right">Profil dominant : <b style="color:var(--accent)">Contemplatif Poétique</b></small>
+                </div>
+
+                <p class="comment-text">
+                  J’ai ressenti un effet de bascule : l’œuvre ne “raconte” pas seulement, elle impose un rythme d’attention.
+                  L’immersion n’est pas spectaculaire : elle est lente, presque tactile. Là où le film m’a pris, c’est dans la cohérence
+                  entre la mise en scène et ce qu’elle me force à regarder (et à laisser hors champ).
+                </p>
+
+                <!-- collapsed row: visible by default -->
+                <div class="collapsed-row">
+                  <div class="prc" aria-label="Résumé P/R/C">
+                    <span class="chip"><span class="swatch p"></span> P 48%</span>
+                    <span class="chip"><span class="swatch r"></span> R 18%</span>
+                    <span class="chip"><span class="swatch c"></span> C 34%</span>
+
+                    <span class="profile-badge" style="margin-left:6px">
+                      <span class="profile-icon" title="Contemplatif Poétique (survol pour le nom)">
+                        <!-- petite icône inline (SVG) -->
+                        <img alt="" src="data:image/svg+xml;utf8,
+                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'>
+                            <circle cx='12' cy='12' r='9' fill='%231f6f63' opacity='.18'/>
+                            <path d='M6 14c3-6 9-6 12 0' fill='none' stroke='%231f6f63' stroke-width='2' stroke-linecap='round'/>
+                            <circle cx='9' cy='10' r='1.2' fill='%231f6f63'/>
+                            <circle cx='15' cy='10' r='1.2' fill='%231f6f63'/>
+                          </svg>"/>
+                      </span>
+                    </span>
+                  </div>
+
+                  <button class="accordion-btn" type="button" data-accordion aria-expanded="false">
+                    Détails <span class="chev" aria-hidden="true"></span>
+                  </button>
+                </div>
+
+                <!-- expanded -->
+                <div class="accordion" data-panel>
+                  <div class="web" aria-label="Toile de sens">
+                    <div class="hint">Toile de sens</div>
+                    <svg viewBox="0 0 800 260" role="img" aria-label="Réseau en perspective">
+                      <!-- grid-ish lines -->
+                      <defs>
+                        <linearGradient id="lgLine" x1="0" x2="1">
+                          <stop offset="0" stop-color="rgba(39,60,134,.18)"/>
+                          <stop offset="1" stop-color="rgba(31,111,99,.18)"/>
+                        </linearGradient>
+                        <linearGradient id="lgP" x1="0" x2="1">
+                          <stop offset="0" stop-color="rgba(47,122,229,.55)"/>
+                          <stop offset="1" stop-color="rgba(47,122,229,.08)"/>
+                        </linearGradient>
+                        <linearGradient id="lgC" x1="0" x2="1">
+                          <stop offset="0" stop-color="rgba(240,107,45,.50)"/>
+                          <stop offset="1" stop-color="rgba(240,107,45,.10)"/>
+                        </linearGradient>
+                        <linearGradient id="lgR" x1="0" x2="1">
+                          <stop offset="0" stop-color="rgba(106,110,232,.52)"/>
+                          <stop offset="1" stop-color="rgba(106,110,232,.10)"/>
+                        </linearGradient>
+                      </defs>
+
+                      <g opacity=".55" stroke="url(#lgLine)" stroke-width="2">
+                        <path d="M70,215 C190,100 260,110 360,160 C460,210 560,60 730,145" fill="none"/>
+                        <path d="M95,205 C200,145 310,60 420,130 C530,200 610,190 730,120" fill="none"/>
+                        <path d="M110,220 C220,220 310,155 410,150 C520,145 610,100 720,95" fill="none"/>
+                      </g>
+
+                      <!-- emphasis needles -->
+                      <g stroke-width="4" fill="none">
+                        <path d="M110,220 C250,90 420,70 625,110" stroke="url(#lgP)" />
+                        <path d="M110,220 C270,200 430,150 650,145" stroke="url(#lgR)" />
+                        <path d="M110,220 C260,120 520,210 720,95" stroke="url(#lgC)" />
+                      </g>
+
+                      <!-- nodes -->
+                      <g>
+                        <circle cx="110" cy="220" r="12" fill="#111827" opacity=".85"/>
+                        <circle cx="260" cy="120" r="14" fill="rgba(39,60,134,.20)" stroke="rgba(39,60,134,.45)" stroke-width="2"/>
+                        <circle cx="420" cy="80" r="18" fill="rgba(31,111,99,.20)" stroke="rgba(31,111,99,.45)" stroke-width="2"/>
+                        <circle cx="625" cy="110" r="16" fill="rgba(200,210,35,.20)" stroke="rgba(200,210,35,.60)" stroke-width="2"/>
+                        <circle cx="720" cy="95" r="12" fill="rgba(240,107,45,.18)" stroke="rgba(240,107,45,.55)" stroke-width="2"/>
+                        <circle cx="650" cy="145" r="11" fill="rgba(106,110,232,.18)" stroke="rgba(106,110,232,.55)" stroke-width="2"/>
+                      </g>
+                    </svg>
+                  </div>
+
+                  <div class="radar" aria-label="Radar P/R/C et critères">
+                    <div class="radar-top">
+                      <strong>Radar P/R/C</strong>
+                      <span>Résonance : <b style="color:var(--accent)">78%</b></span>
+                    </div>
+
+                    <!-- Radar SVG (triangle) -->
+                    <svg viewBox="0 0 320 200" role="img" aria-label="Radar P/R/C">
+                      <defs>
+                        <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                          <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="rgba(16,24,40,.18)" />
+                        </filter>
+                      </defs>
+
+                      <!-- grid -->
+                      <g stroke="rgba(16,24,40,.12)" stroke-width="1" fill="none">
+                        <polygon points="160,25 35,165 285,165"/>
+                        <polygon points="160,55 65,155 255,155"/>
+                        <polygon points="160,85 95,145 225,145"/>
+                        <polygon points="160,115 125,135 195,135"/>
+                      </g>
+
+                      <!-- axes labels -->
+                      <g font-family="DM Sans" font-size="12" fill="rgba(16,24,40,.62)" font-weight="700">
+                        <text x="154" y="18">C</text>
+                        <text x="18" y="175">P</text>
+                        <text x="294" y="175">R</text>
+                      </g>
+
+                      <!-- shape (P=48, R=18, C=34) -->
+                      <!-- map values onto triangle corners: P left, R right, C top -->
+                      <polygon
+                        points="96,146 206,152 160,90"
+                        fill="rgba(31,111,99,.12)"
+                        stroke="rgba(31,111,99,.55)"
+                        stroke-width="2"
+                        filter="url(#softShadow)"
+                      />
+                      <g>
+                        <circle cx="96" cy="146" r="4.2" fill="var(--p)"/>
+                        <circle cx="206" cy="152" r="4.2" fill="var(--rr)"/>
+                        <circle cx="160" cy="90" r="4.2" fill="var(--c)"/>
+                      </g>
+                    </svg>
+
+                    <div class="legend">
+                      <span class="chip"><span class="swatch p"></span> Perceptif 48%</span>
+                      <span class="chip"><span class="swatch r"></span> Rationnel 18%</span>
+                      <span class="chip"><span class="swatch c"></span> Conceptuel 34%</span>
+                    </div>
+
+                    <div class="criteria" aria-label="Critères dominants">
+                      <div class="criterion">
+                        <b>Immersion</b>
+                        <div class="bar"><i style="width:72%"></i></div>
+                        <span class="pct">72%</span>
+                      </div>
+                      <div class="criterion">
+                        <b>Polysémie</b>
+                        <div class="bar"><i style="width:61%"></i></div>
+                        <span class="pct">61%</span>
+                      </div>
+                      <div class="criterion">
+                        <b>Cohérence</b>
+                        <div class="bar"><i style="width:54%"></i></div>
+                        <span class="pct">54%</span>
+                      </div>
+                      <div class="criterion">
+                        <b>Résonance</b>
+                        <div class="bar"><i style="width:78%"></i></div>
+                        <span class="pct">78%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </article>
+
+            <!-- Comment 2 -->
+            <article class="comment" data-comment>
+              <div class="avatar" title="Benjamin N.">BN</div>
+
+              <div class="comment-main">
+                <div class="comment-top">
+                  <div>
+                    <h4>Benjamin N.</h4>
+                    <small>Analyse publiée • 11 min</small>
+                  </div>
+                  <small style="text-align:right">Profil dominant : <b style="color:var(--accent2)">Technicien Nuancé</b></small>
+                </div>
+
+                <p class="comment-text">
+                  Le film tient par ses choix de mise en scène : cadrage, respiration, montage. En revanche, je trouve que
+                  la progression dramatique se repose parfois sur des raccourcis. La force est ailleurs : dans la précision des
+                  motifs, et dans la façon dont le film “prépare” une lecture sans l’imposer totalement.
+                </p>
+
+                <div class="collapsed-row">
+                  <div class="prc">
+                    <span class="chip"><span class="swatch p"></span> P 34%</span>
+                    <span class="chip"><span class="swatch r"></span> R 52%</span>
+                    <span class="chip"><span class="swatch c"></span> C 14%</span>
+
+                    <span class="profile-badge" style="margin-left:6px">
+                      <span class="profile-icon" title="Technicien Nuancé">
+                        <img alt="" src="data:image/svg+xml;utf8,
+                          <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'>
+                            <rect x='5' y='6' width='14' height='12' rx='3' fill='%23273c86' opacity='.16'/>
+                            <path d='M8 12h8' stroke='%23273c86' stroke-width='2' stroke-linecap='round'/>
+                            <path d='M12 9v6' stroke='%23273c86' stroke-width='2' stroke-linecap='round'/>
+                          </svg>"/>
+                      </span>
+                    </span>
+                  </div>
+
+                  <button class="accordion-btn" type="button" data-accordion aria-expanded="false">
+                    Détails <span class="chev" aria-hidden="true"></span>
+                  </button>
+                </div>
+
+                <div class="accordion" data-panel>
+                  <div class="web">
+                    <div class="hint">Toile de sens</div>
+                    <svg viewBox="0 0 800 260">
+                      <defs>
+                        <linearGradient id="lgLine2" x1="0" x2="1">
+                          <stop offset="0" stop-color="rgba(39,60,134,.18)"/>
+                          <stop offset="1" stop-color="rgba(31,111,99,.18)"/>
+                        </linearGradient>
+                        <linearGradient id="lgP2" x1="0" x2="1">
+                          <stop offset="0" stop-color="rgba(47,122,229,.50)"/>
+                          <stop offset="1" stop-color="rgba(47,122,229,.10)"/>
+                        </linearGradient>
+                        <linearGradient id="lgR2" x1="0" x2="1">
+                          <stop offset="0" stop-color="rgba(106,110,232,.55)"/>
+                          <stop offset="1" stop-color="rgba(106,110,232,.12)"/>
+                        </linearGradient>
+                        <linearGradient id="lgC2" x1="0" x2="1">
+                          <stop offset="0" stop-color="rgba(240,107,45,.45)"/>
+                          <stop offset="1" stop-color="rgba(240,107,45,.10)"/>
+                        </linearGradient>
+                      </defs>
+
+                      <g opacity=".55" stroke="url(#lgLine2)" stroke-width="2">
+                        <path d="M70,215 C210,150 290,70 405,130 C520,195 620,180 730,120" fill="none"/>
+                        <path d="M105,220 C230,210 310,150 410,150 C510,150 610,120 720,95" fill="none"/>
+                        <path d="M85,205 C210,105 360,105 470,155 C580,205 640,70 730,145" fill="none"/>
+                      </g>
+
+                      <g stroke-width="4" fill="none">
+                        <path d="M105,220 C260,210 420,155 650,145" stroke="url(#lgR2)" />
+                        <path d="M105,220 C230,120 520,210 720,95" stroke="url(#lgP2)" opacity=".55"/>
+                        <path d="M105,220 C245,120 360,95 470,155" stroke="url(#lgC2)" opacity=".45"/>
+                      </g>
+
+                      <g>
+                        <circle cx="105" cy="220" r="12" fill="#111827" opacity=".85"/>
+                        <circle cx="310" cy="150" r="13" fill="rgba(106,110,232,.16)" stroke="rgba(106,110,232,.55)" stroke-width="2"/>
+                        <circle cx="420" cy="155" r="16" fill="rgba(31,111,99,.16)" stroke="rgba(31,111,99,.50)" stroke-width="2"/>
+                        <circle cx="650" cy="145" r="15" fill="rgba(39,60,134,.18)" stroke="rgba(39,60,134,.55)" stroke-width="2"/>
+                        <circle cx="720" cy="95" r="12" fill="rgba(47,122,229,.14)" stroke="rgba(47,122,229,.55)" stroke-width="2"/>
+                      </g>
+                    </svg>
+                  </div>
+
+                  <div class="radar">
+                    <div class="radar-top">
+                      <strong>Radar P/R/C</strong>
+                      <span>Résonance : <b style="color:var(--accent2)">67%</b></span>
+                    </div>
+
+                    <svg viewBox="0 0 320 200">
+                      <g stroke="rgba(16,24,40,.12)" stroke-width="1" fill="none">
+                        <polygon points="160,25 35,165 285,165"/>
+                        <polygon points="160,55 65,155 255,155"/>
+                        <polygon points="160,85 95,145 225,145"/>
+                        <polygon points="160,115 125,135 195,135"/>
+                      </g>
+                      <g font-family="DM Sans" font-size="12" fill="rgba(16,24,40,.62)" font-weight="700">
+                        <text x="154" y="18">C</text>
+                        <text x="18" y="175">P</text>
+                        <text x="294" y="175">R</text>
+                      </g>
+
+                      <!-- (P=34, R=52, C=14) -->
+                      <polygon
+                        points="118,152 238,138 160,123"
+                        fill="rgba(39,60,134,.10)"
+                        stroke="rgba(39,60,134,.55)"
+                        stroke-width="2"
+                      />
+                      <g>
+                        <circle cx="118" cy="152" r="4.2" fill="var(--p)"/>
+                        <circle cx="238" cy="138" r="4.2" fill="var(--rr)"/>
+                        <circle cx="160" cy="123" r="4.2" fill="var(--c)"/>
+                      </g>
+                    </svg>
+
+                    <div class="legend">
+                      <span class="chip"><span class="swatch p"></span> Perceptif 34%</span>
+                      <span class="chip"><span class="swatch r"></span> Rationnel 52%</span>
+                      <span class="chip"><span class="swatch c"></span> Conceptuel 14%</span>
+                    </div>
+
+                    <div class="criteria">
+                      <div class="criterion">
+                        <b>Mise en scène</b>
+                        <div class="bar"><i style="width:74%"></i></div>
+                        <span class="pct">74%</span>
+                      </div>
+                      <div class="criterion">
+                        <b>Cohérence</b>
+                        <div class="bar"><i style="width:59%"></i></div>
+                        <span class="pct">59%</span>
+                      </div>
+                      <div class="criterion">
+                        <b>Polysémie</b>
+                        <div class="bar"><i style="width:41%"></i></div>
+                        <span class="pct">41%</span>
+                      </div>
+                      <div class="criterion">
+                        <b>Résonance</b>
+                        <div class="bar"><i style="width:67%"></i></div>
+                        <span class="pct">67%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </article>
+
+          </div>
+        </div>
+
+        <aside class="side-stack">
+          <div class="poster">
+            <div class="label">Affiche • Film A</div>
+          </div>
+
+          <div class="note">
+            <div style="font-size:1.2rem">🧩</div>
+            <div>
+              <b>Lecture rapide</b><br>
+              Les avis sont “filtrés” par profils : on lit d’abord une structure de réception, puis on revient au texte.
+            </div>
+          </div>
+
+          <div class="note">
+            <div style="font-size:1.2rem">🎛️</div>
+            <div>
+              <b>Module repliable</b><br>
+              Le radar P/R/C est avant le commentaire dans la logique “bloc”, mais ici il est dans le panneau déplié, comme demandé.
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- PASSPORT -->
+    <section class="view" id="view-passport">
+      <div class="hero">
+        <div class="hero-title">
+          <h2>Passeport</h2>
+          <p>
+            Espace “identité de lecture” : une synthèse de vos tendances P/R/C, profils dominants, et stabilité de vos critères.
+            Ici : une version volontairement sobre, blanche, sans décor.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-header">
+            <h3>Votre signature</h3>
+            <small>sur 90 derniers films</small>
+          </div>
+          <div class="card-body">
+            <div class="quick">
+              <div>
+                <strong>Dominante : Explorateur Équilibré</strong>
+                <div style="margin-top:6px;color:var(--muted);font-weight:650">
+                  Variabilité : moyenne • Résonance moyenne : <b style="color:var(--accent)">62%</b>
+                </div>
+              </div>
+              <div class="mini">
+                <span class="mini-badge"><span class="swatch p"></span> P <em>38%</em></span>
+                <span class="mini-badge"><span class="swatch r"></span> R <em>28%</em></span>
+                <span class="mini-badge"><span class="swatch c"></span> C <em>34%</em></span>
+              </div>
+            </div>
+
+            <div style="height:14px"></div>
+
+            <div class="criteria">
+              <div class="criterion">
+                <b>Immersion</b>
+                <div class="bar"><i style="width:58%"></i></div>
+                <span class="pct">58%</span>
+              </div>
+              <div class="criterion">
+                <b>Polysémie</b>
+                <div class="bar"><i style="width:63%"></i></div>
+                <span class="pct">63%</span>
+              </div>
+              <div class="criterion">
+                <b>Cohérence</b>
+                <div class="bar"><i style="width:49%"></i></div>
+                <span class="pct">49%</span>
+              </div>
+              <div class="criterion">
+                <b>Résonance</b>
+                <div class="bar"><i style="width:62%"></i></div>
+                <span class="pct">62%</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <aside class="side-stack">
+          <div class="note">
+            <div style="font-size:1.2rem">🪪</div>
+            <div>
+              <b>À rendre plus “inspiré”</b><br>
+              On peut transformer ce passeport en carte “météo” : vents P/R/C + stabilité + pics de critères, sur fond blanc.
+            </div>
+          </div>
+          <div class="note">
+            <div style="font-size:1.2rem">🧠</div>
+            <div>
+              <b>Usage</b><br>
+              Au lieu de “notes”, on lit une compatibilité : votre signature vs la signature d’un commentaire.
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- COLLECTION -->
+    <section class="view" id="view-collection">
+      <div class="hero">
+        <div class="hero-title">
+          <h2>Ma collection</h2>
+          <p>
+            Un espace type “Last.fm” : vous retrouvez tous les films vus. En cliquant une affiche, vous ouvrez votre avis et ses stats.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Films vus</h3>
+          <small>cliquer une affiche</small>
+        </div>
+        <div class="card-body">
+          <div class="collection-grid" id="collectionGrid"></div>
+
+          <div class="drawer" id="filmDrawer">
+            <div class="drawer-top">
+              <h3 id="drawerTitle">Film</h3>
+              <button class="btn" id="closeDrawer">Fermer</button>
+            </div>
+            <div class="drawer-body" id="drawerBody"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WRITE -->
+    <section class="view" id="view-write">
+      <div class="hero">
+        <div class="hero-title">
+          <h2>Rédiger une analyse</h2>
+          <p>
+            Vous écrivez obligatoirement pour chaque critère (texte) + vous attribuez un pourcentage, puis vous publiez.
+            Ici, on simule la contrainte : impossible de valider si un critère est vide.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn ghost" id="fillDemo">Pré-remplir (démo)</button>
+          <button class="btn primary" id="submitReview">Publier mon analyse</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Film : “Exemple — Film A”</h3>
+          <small>réglage + texte obligatoire</small>
+        </div>
+        <div class="card-body">
+          <div class="form" id="reviewForm">
+            <!-- fields injected -->
+          </div>
+          <div class="error" id="formError">Veuillez compléter tous les champs (texte + pourcentage) avant de publier.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RETRO -->
+    <section class="view" id="view-retro">
+      <div class="hero">
+        <div class="hero-title">
+          <h2>Rétrospective</h2>
+          <p>
+            Vue d’ensemble : votre “compas” de réception (P/R/C) + des trajectoires de films (nœuds) vers des zones de lecture.
+            Fond blanc, lignes fines, lecture cartographique.
+          </p>
+        </div>
+      </div>
+
+      <div class="compass">
+        <svg viewBox="0 0 1200 420" role="img" aria-label="Compas et trajectoires">
+          <!-- Compass rings -->
+          <g fill="none" stroke="rgba(16,24,40,.10)" stroke-width="2">
+            <circle cx="260" cy="210" r="150"/>
+            <circle cx="260" cy="210" r="105"/>
+            <circle cx="260" cy="210" r="60"/>
+          </g>
+
+          <!-- Axes -->
+          <g stroke="rgba(16,24,40,.12)" stroke-width="2">
+            <line x1="260" y1="50" x2="260" y2="370"/>
+            <line x1="110" y1="210" x2="410" y2="210"/>
+            <line x1="150" y1="120" x2="370" y2="300"/>
+          </g>
+
+          <!-- Labels -->
+          <g font-family="DM Sans" font-size="14" fill="rgba(16,24,40,.70)" font-weight="800">
+            <text x="252" y="38">C</text>
+            <text x="92" y="214">P</text>
+            <text x="424" y="214">R</text>
+          </g>
+
+          <!-- Node cloud (films) -->
+          <g>
+            <!-- anchor points bottom -->
+            <circle cx="660" cy="360" r="6" fill="rgba(16,24,40,.60)"/>
+            <circle cx="760" cy="360" r="6" fill="rgba(16,24,40,.60)"/>
+            <circle cx="860" cy="360" r="6" fill="rgba(16,24,40,.60)"/>
+
+            <!-- trajectories -->
+            <path d="M660,360 C640,260 610,210 520,175" stroke="rgba(47,122,229,.35)" stroke-width="3" fill="none"/>
+            <path d="M760,360 C740,270 700,210 610,205" stroke="rgba(106,110,232,.35)" stroke-width="3" fill="none"/>
+            <path d="M860,360 C820,270 760,240 700,180" stroke="rgba(240,107,45,.32)" stroke-width="3" fill="none"/>
+
+            <!-- nodes -->
+            <circle cx="520" cy="175" r="28" fill="rgba(47,122,229,.10)" stroke="rgba(47,122,229,.45)" stroke-width="2"/>
+            <circle cx="610" cy="205" r="22" fill="rgba(106,110,232,.10)" stroke="rgba(106,110,232,.45)" stroke-width="2"/>
+            <circle cx="700" cy="180" r="26" fill="rgba(240,107,45,.10)" stroke="rgba(240,107,45,.45)" stroke-width="2"/>
+
+            <!-- right legend area -->
+            <rect x="920" y="80" width="240" height="260" rx="20" fill="#fff" stroke="rgba(16,24,40,.10)" />
+            <g font-family="DM Sans" font-size="14" font-weight="800" fill="rgba(16,24,40,.75)">
+              <text x="950" y="120">Synthèse</text>
+              <text x="950" y="150" font-weight="700" fill="rgba(16,24,40,.55)">90 films • 62% résonance</text>
+            </g>
+            <g font-family="DM Sans" font-size="13" font-weight="750">
+              <circle cx="960" cy="190" r="6" fill="rgba(47,122,229,.8)"/>
+              <text x="975" y="195" fill="rgba(16,24,40,.75)">Perceptif 38%</text>
+              <circle cx="960" cy="220" r="6" fill="rgba(106,110,232,.8)"/>
+              <text x="975" y="225" fill="rgba(16,24,40,.75)">Rationnel 28%</text>
+              <circle cx="960" cy="250" r="6" fill="rgba(240,107,45,.8)"/>
+              <text x="975" y="255" fill="rgba(16,24,40,.75)">Conceptuel 34%</text>
+            </g>
+          </g>
+        </svg>
+
+        <div class="subnote">
+          Cette rétrospective est volontairement minimale (fond blanc). Si vous voulez pousser le côté “inspiré”,
+          on peut transformer ce compas en “carte des vents” (à la manière de votre référence) : un rose des vents P/R/C,
+          des aiguilles de critères (immersion/polysémie/cohérence/résonance), et des films comme points reliés à des zones.
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  // ----------------------------
+  // Données démo (mock)
+  // ----------------------------
+  const collection = [
+    { id: "f1", title: "Film A", year: 2024, prc:{p:41,r:22,c:37}, resonance:64, profile:"Explorateur Équilibré" },
+    { id: "f2", title: "Film B", year: 2019, prc:{p:22,r:58,c:20}, resonance:55, profile:"Technicien Nuancé" },
+    { id: "f3", title: "Film C", year: 1997, prc:{p:62,r:14,c:24}, resonance:71, profile:"Spectateur Saisi" },
+    { id: "f4", title: "Film D", year: 2021, prc:{p:28,r:26,c:46}, resonance:66, profile:"Lyrique Conceptuel" },
+    { id: "f5", title: "Film E", year: 1985, prc:{p:35,r:33,c:32}, resonance:60, profile:"Observateur Neutre" },
+    { id: "f6", title: "Film F", year: 2007, prc:{p:18,r:54,c:28}, resonance:52, profile:"Anatomiste Narratif" },
+    { id: "f7", title: "Film G", year: 2023, prc:{p:48,r:18,c:34}, resonance:78, profile:"Contemplatif Poétique" },
+    { id: "f8", title: "Film H", year: 2013, prc:{p:30,r:40,c:30}, resonance:58, profile:"Appréciateur Nuancé" },
+    { id: "f9", title: "Film I", year: 2001, prc:{p:55,r:20,c:25}, resonance:63, profile:"Instinctif Sensoriel" },
+        { id: "f10", title: "Film J", year: 1992, prc:{p:26,r:20,c:54}, resonance:69, profile:"Contemplatif Poétique" },
+    { id: "f11", title: "Film K", year: 2020, prc:{p:44,r:36,c:20}, resonance:61, profile:"Technicien Nuancé" },
+    { id: "f12", title: "Film L", year: 1976, prc:{p:20,r:30,c:50}, resonance:73, profile:"Lyrique Conceptuel" },
+  ];
+
+  // Champs “Rédiger” (texte obligatoire + pourcentage)
+  const criteriaSchema = [
+    { key:"immersion", label:"Immersion", hint:"Décrivez ce qui vous immerge (ou pas) et pourquoi." , default:58 },
+    { key:"polysemie", label:"Polysémie", hint:"Décrivez la place de l’ouverture / ambiguïté / dérive de sens.", default:63 },
+    { key:"coherence", label:"Cohérence", hint:"Décrivez la cohérence (ou rupture) entre intention, forme et matière.", default:49 },
+    { key:"resonance", label:"Résonance", hint:"Décrivez l’impact (immédiat et/ou différé) et sa nature.", default:62 },
+  ];
+
+  // ----------------------------
+  // Helpers DOM
+  // ----------------------------
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+  function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+  function setActiveTab(tabId){
+    // tabs
+    $$(".tab").forEach(btn=>{
+      const on = btn.dataset.tab === tabId;
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    // views
+    $$(".view").forEach(v=>{
+      v.classList.toggle("active", v.id === `view-${tabId}`);
+    });
+    // scroll top of main view for clarity
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // ----------------------------
+  // Accordions (comments)
+  // ----------------------------
+  function wireAccordions(scope=document){
+    $$("[data-accordion]", scope).forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const article = btn.closest("[data-comment]");
+        const panel = $("[data-panel]", article);
+        const expanded = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", expanded ? "false" : "true");
+        panel.classList.toggle("open", !expanded);
+      });
+    });
+  }
+
+  function setAllAccordions(open){
+    $$("[data-comment]").forEach(article=>{
+      const btn = $("[data-accordion]", article);
+      const panel = $("[data-panel]", article);
+      if(!btn || !panel) return;
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      panel.classList.toggle("open", open);
+    });
+  }
+
+  // ----------------------------
+  // Collection rendering + drawer
+  // ----------------------------
+  function renderCollection(){
+    const grid = $("#collectionGrid");
+    if(!grid) return;
+
+    grid.innerHTML = collection.map(f=>`
+      <div class="tile" data-film="${f.id}" role="button" tabindex="0" aria-label="Ouvrir ${escapeHtml(f.title)}">
+        <div class="img"></div>
+        <div class="meta">
+          <b>${escapeHtml(f.title)}</b>
+          <small>${f.year} • ${escapeHtml(f.profile)}</small>
+        </div>
+      </div>
+    `).join("");
+
+    // click + keyboard
+    $$("[data-film]", grid).forEach(tile=>{
+      const open = ()=> openDrawer(tile.dataset.film);
+      tile.addEventListener("click", open);
+      tile.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          open();
+        }
+      });
+    });
+  }
+
+  function openDrawer(filmId){
+    const film = collection.find(x=>x.id===filmId);
+    if(!film) return;
+
+    const drawer = $("#filmDrawer");
+    const title = $("#drawerTitle");
+    const body = $("#drawerBody");
+    if(!drawer || !title || !body) return;
+
+    title.textContent = `${film.title} (${film.year})`;
+
+    body.innerHTML = `
+      <div class="quick" style="margin-bottom:14px">
+        <div>
+          <strong>${escapeHtml(film.profile)}</strong>
+          <div style="margin-top:6px;color:var(--muted);font-weight:650">
+            Résonance : <span style="color:var(--ink);font-weight:900">${film.resonance}%</span>
+          </div>
+        </div>
+        <div class="mini">
+          <span class="mini-badge"><span class="swatch p"></span> P <em>${film.prc.p}%</em></span>
+          <span class="mini-badge"><span class="swatch r"></span> R <em>${film.prc.r}%</em></span>
+          <span class="mini-badge"><span class="swatch c"></span> C <em>${film.prc.c}%</em></span>
+        </div>
+      </div>
+
+      <div class="radar" aria-label="Radar P/R/C (film)">
+        <div class="radar-top">
+          <strong>Radar P/R/C</strong>
+          <span>Résumé de lecture</span>
+        </div>
+
+        <svg viewBox="0 0 320 200" role="img" aria-label="Radar P/R/C du film">
+          <g stroke="rgba(16,24,40,.12)" stroke-width="1" fill="none">
+            <polygon points="160,25 35,165 285,165"/>
+            <polygon points="160,55 65,155 255,155"/>
+            <polygon points="160,85 95,145 225,145"/>
+            <polygon points="160,115 125,135 195,135"/>
+          </g>
+          <g font-family="DM Sans" font-size="12" fill="rgba(16,24,40,.62)" font-weight="700">
+            <text x="154" y="18">C</text>
+            <text x="18" y="175">P</text>
+            <text x="294" y="175">R</text>
+          </g>
+
+          ${radarPolygonForPRC(film.prc)}
+        </svg>
+
+        <div class="legend">
+          <span class="chip"><span class="swatch p"></span> Perceptif ${film.prc.p}%</span>
+          <span class="chip"><span class="swatch r"></span> Rationnel ${film.prc.r}%</span>
+          <span class="chip"><span class="swatch c"></span> Conceptuel ${film.prc.c}%</span>
+        </div>
+      </div>
+    `;
+
+    drawer.classList.add("open");
+    drawer.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  function closeDrawer(){
+    const drawer = $("#filmDrawer");
+    if(drawer) drawer.classList.remove("open");
+  }
+
+  // Simple mapping -> triangle coords (approx) like the mock above
+  function radarPolygonForPRC(prc){
+    // triangle corners: P (left-bottom), R (right-bottom), C (top)
+    // We'll map value 0..100 into barycentric-ish interpolation.
+    // For a clean prototype, we use a tuned linear mapping:
+    const P = clamp(prc.p,0,100)/100;
+    const R = clamp(prc.r,0,100)/100;
+    const C = clamp(prc.c,0,100)/100;
+
+    // base triangle points
+    const pLeft = {x:35, y:165};
+    const pRight= {x:285,y:165};
+    const pTop  = {x:160,y:25};
+
+    // barycentric weighted sum (normalized)
+    const sum = P+R+C || 1;
+    const wP = P/sum, wR = R/sum, wC = C/sum;
+
+    const x = wP*pLeft.x + wR*pRight.x + wC*pTop.x;
+    const y = wP*pLeft.y + wR*pRight.y + wC*pTop.y;
+
+    // We want a triangle-like polygon, not a single point.
+    // Create 3 points by slightly biasing each axis by its weight.
+    const ptP = mixPoint(pTop, pLeft, 0.20 + 0.70*wP);
+    const ptR = mixPoint(pTop, pRight,0.20 + 0.70*wR);
+    const ptC = mixPoint({x:160,y:165}, pTop, 0.20 + 0.70*wC);
+
+    return `
+      <polygon
+        points="${ptP.x.toFixed(1)},${ptP.y.toFixed(1)} ${ptR.x.toFixed(1)},${ptR.y.toFixed(1)} ${ptC.x.toFixed(1)},${ptC.y.toFixed(1)}"
+        fill="rgba(31,111,99,.10)"
+        stroke="rgba(31,111,99,.55)"
+        stroke-width="2"
+      />
+      <g>
+        <circle cx="${ptP.x.toFixed(1)}" cy="${ptP.y.toFixed(1)}" r="4.2" fill="var(--p)"/>
+        <circle cx="${ptR.x.toFixed(1)}" cy="${ptR.y.toFixed(1)}" r="4.2" fill="var(--rr)"/>
+        <circle cx="${ptC.x.toFixed(1)}" cy="${ptC.y.toFixed(1)}" r="4.2" fill="var(--c)"/>
+      </g>
+    `;
+  }
+
+  function mixPoint(a,b,t){
+    return { x: a.x + (b.x-a.x)*t, y: a.y + (b.y-a.y)*t };
+  }
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // ----------------------------
+  // Write form (mandatory text + percent)
+  // ----------------------------
+  function renderWriteForm(){
+    const form = $("#reviewForm");
+    if(!form) return;
+
+    form.innerHTML = criteriaSchema.map(c=>`
+      <div class="field" data-field="${c.key}">
+        <div class="field-head">
+          <b>${escapeHtml(c.label)}</b>
+          <small>${escapeHtml(c.hint)}</small>
+        </div>
+
+        <textarea
+          data-text="${c.key}"
+          placeholder="Écrivez votre analyse pour : ${escapeHtml(c.label)}"
+          aria-label="Texte ${escapeHtml(c.label)}"
+        ></textarea>
+
+        <div class="range-row">
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="${c.default}"
+            data-range="${c.key}"
+            aria-label="Pourcentage ${escapeHtml(c.label)}"
+          />
+          <div class="range-pill" data-pill="${c.key}">${c.default}%</div>
+        </div>
+      </div>
+    `).join("");
+
+    // wire range -> pill
+    criteriaSchema.forEach(c=>{
+      const r = $(`[data-range="${c.key}"]`, form);
+      const pill = $(`[data-pill="${c.key}"]`, form);
+      if(!r || !pill) return;
+      r.addEventListener("input", ()=>{
+        pill.textContent = `${r.value}%`;
+      });
+    });
+  }
+
+  function fillDemo(){
+    const form = $("#reviewForm");
+    if(!form) return;
+
+    const demoText = {
+      immersion: "Je suis entré dans le film par le rythme : la mise en scène me force à tenir une attention continue.",
+      polysemie: "Le sens reste ouvert : plusieurs lectures cohabitent sans que l’une écrase les autres.",
+      coherence: "Les choix formels sont cohérents avec le propos implicite : on sent une nécessité plutôt qu’un effet.",
+      resonance: "L’impact s’étire après coup : certains plans reviennent et reconfigurent mon interprétation."
+    };
+
+    criteriaSchema.forEach(c=>{
+      const ta = $(`[data-text="${c.key}"]`, form);
+      const ra = $(`[data-range="${c.key}"]`, form);
+      const pill = $(`[data-pill="${c.key}"]`, form);
+      if(ta) ta.value = demoText[c.key] || "";
+      if(ra) ra.value = c.default;
+      if(pill) pill.textContent = `${c.default}%`;
+    });
+
+    $("#formError").style.display = "none";
+  }
+
+  function validateWriteForm(){
+    const form = $("#reviewForm");
+    if(!form) return false;
+
+    let ok = true;
+    criteriaSchema.forEach(c=>{
+      const ta = $(`[data-text="${c.key}"]`, form);
+      const ra = $(`[data-range="${c.key}"]`, form);
+
+      const txtOk = ta && ta.value.trim().length > 0;
+      const pctOk = ra && ra.value !== "" && !Number.isNaN(Number(ra.value));
+
+      if(!txtOk || !pctOk) ok = false;
+    });
+
+    return ok;
+  }
+
+  // ----------------------------
+  // Wiring global UI
+  // ----------------------------
+  function wireTabs(){
+    $$(".tab").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        setActiveTab(btn.dataset.tab);
+      });
+    });
+  }
+
+  function wireActions(){
+    const toggleAll = $("#toggleAll");
+    if(toggleAll){
+      let open = false;
+      toggleAll.addEventListener("click", ()=>{
+        open = !open;
+        setAllAccordions(open);
+      });
+    }
+
+    const jumpWrite = $("#jumpWrite");
+    if(jumpWrite){
+      jumpWrite.addEventListener("click", ()=>{
+        setActiveTab("write");
+      });
+    }
+
+    const closeBtn = $("#closeDrawer");
+    if(closeBtn) closeBtn.addEventListener("click", closeDrawer);
+
+    const fill = $("#fillDemo");
+    if(fill) fill.addEventListener("click", fillDemo);
+
+    const submit = $("#submitReview");
+    if(submit){
+      submit.addEventListener("click", ()=>{
+        const ok = validateWriteForm();
+        const err = $("#formError");
+        if(!ok){
+          if(err) err.style.display = "block";
+          return;
+        }
+        if(err) err.style.display = "none";
+        alert("✅ Analyse publiée (prototype) — dans un vrai produit, elle serait envoyée et indexée (P/R/C + profils + critères).");
+      });
+    }
+  }
+
+  // ----------------------------
+  // Init
+  // ----------------------------
+  wireTabs();
+  wireAccordions();
+  renderCollection();
+  renderWriteForm();
+  wireActions();
+
+  // petit confort : clic sur l’icône “Tout déplier/replier” ne doit pas casser les panneaux init
+  setAllAccordions(false);
+
+})();
+</script>
+</body>
+</html>
+
