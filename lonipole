@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sélectionner les canaux de recrutement - Boulangeries Ange</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --vert-lime: #c8d223;
+            --vert-fonce: #195850;
+            --bleu-marine: #273c86;
+            --blanc: #ffffff;
+            --gris-clair: #f8f9fa;
+            --gris-texte: #4a4a4a;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--blanc);
+            color: var(--gris-texte);
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--blanc);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--vert-lime);
+            flex-shrink: 0;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-badge {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--vert-lime) 0%, #a8b31e 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(200, 210, 35, 0.3);
+        }
+
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--bleu-marine);
+            font-weight: 600;
+        }
+
+        .progress-area {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .progress-bar-container {
+            width: 200px;
+            height: 8px;
+            background: var(--gris-clair);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--vert-fonce), var(--vert-lime));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .score-display {
+            background: var(--gris-clair);
+            padding: 8px 20px;
+            border-radius: 24px;
+            font-weight: 500;
+            color: var(--bleu-marine);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-icon {
+            color: var(--vert-lime);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Screens */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Intro Screen */
+        .intro-screen {
+            background: linear-gradient(135deg, var(--blanc) 0%, #f0f4e8 100%);
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .intro-card {
+            max-width: 800px;
+            text-align: center;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .intro-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--vert-fonce) 0%, var(--bleu-marine) 100%);
+            border-radius: 24px;
+            margin: 0 auto 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 16px 40px rgba(25, 88, 80, 0.2);
+        }
+
+        .intro-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--bleu-marine);
+            margin-bottom: 16px;
+        }
+
+        .intro-subtitle {
+            font-size: 1.1rem;
+            color: var(--gris-texte);
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+
+        .intro-context {
+            background: var(--blanc);
+            border-left: 4px solid var(--vert-lime);
+            padding: 24px;
+            text-align: left;
+            margin-bottom: 32px;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .intro-context h3 {
+            color: var(--vert-fonce);
+            margin-bottom: 12px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .intro-context p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            padding: 16px 40px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--vert-fonce) 0%, #1e6b61 100%);
+            color: var(--blanc);
+            box-shadow: 0 4px 16px rgba(25, 88, 80, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(25, 88, 80, 0.4);
+        }
+
+        /* Scenario Screen */
+        .scenario-screen {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .scenario-left {
+            width: 40%;
+            background: linear-gradient(180deg, var(--bleu-marine) 0%, #1e2d5c 100%);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: var(--blanc);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scenario-left::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(200, 210, 35, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .scenario-number {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--vert-lime);
+            margin-bottom: 16px;
+        }
+
+        .scenario-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 24px;
+            line-height: 1.3;
+        }
+
+        .scenario-context {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .context-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .context-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .context-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(200, 210, 35, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .context-text {
+            flex: 1;
+        }
+
+        .context-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 4px;
+        }
+
+        .context-value {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .scenario-right {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .question-prompt {
+            font-size: 1.1rem;
+            color: var(--bleu-marine);
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .channel-card {
+            background: var(--blanc);
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .channel-card:hover {
+            border-color: var(--vert-fonce);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .channel-card.selected {
+            border-color: var(--vert-fonce);
+            background: linear-gradient(135deg, #f0f9f7 0%, #f8fdf8 100%);
+        }
+
+        .channel-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            background: var(--vert-fonce);
+            color: var(--blanc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .channel-card.correct {
+            border-color: var(--success);
+            background: #f0fdf4;
+        }
+
+        .channel-card.incorrect {
+            border-color: var(--error);
+            background: #fef2f2;
+        }
+
+        .channel-card.missed {
+            border-color: var(--warning);
+            background: #fffbeb;
+        }
+
+        .channel-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gris-clair);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .channel-name {
+            font-weight: 600;
+            color: var(--bleu-marine);
+            margin-bottom: 6px;
+        }
+
+        .channel-desc {
+            font-size: 0.85rem;
+            color: var(--gris-texte);
+            line-height: 1.4;
+        }
+
+        .action-area {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selection-hint {
+            font-size: 0.9rem;
+            color: var(--gris-texte);
+        }
+
+        .selection-count {
+            font-weight: 600;
+            color: var(--vert-fonce);
+        }
+
+        .btn-validate {
+            background: var(--bleu-marine);
+            color: var(--blanc);
+        }
+
+        .btn-validate:hover {
+            background: #1e2d5c;
+        }
+
+        .btn-validate:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Feedback */
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feedback-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .feedback-card {
+            background: var(--blanc);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+            animation: scaleIn 0.4s ease;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .feedback-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+        }
+
+        .feedback-icon.success {
+            background: #dcfce7;
+            color: var(--success);
+        }
+
+        .feedback-icon.partial {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .feedback-icon.error {
+            background: #fee2e2;
+            color: var(--error);
+        }
+
+        .feedback-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--bleu-marine);
+            margin-bottom: 12px;
+        }
+
+        .feedback-text {
+            color: var(--gris-texte);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .feedback-details {
+            background: var(--gris-clair);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+
+        .feedback-details h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--vert-fonce);
+            margin-bottom: 12px;
+        }
+
+        .feedback-details p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .points-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--vert-lime) 0%, #b5c120 100%);
+            color: var(--bleu-marine);
+            padding: 8px 20px;
+            border-radius: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        /* Results Screen */
+        .results-screen {
+            background: linear-gradient(135deg, var(--blanc) 0%, #f0f4e8 100%);
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .results-card {
+            max-width: 700px;
+            background: var(--blanc);
+            border-radius: 24px;
+            padding: 48px;
+            text-align: center;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .results-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 48px;
+        }
+
+        .results-icon.excellent {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: var(--success);
+        }
+
+        .results-icon.good {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: var(--warning);
+        }
+
+        .results-icon.needs-work {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: var(--error);
+        }
+
+        .results-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--bleu-marine);
+            margin-bottom: 16px;
+        }
+
+        .results-score {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--vert-fonce) 0%, var(--bleu-marine) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+        }
+
+        .results-message {
+            font-size: 1.1rem;
+            color: var(--gris-texte);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .key-learnings {
+            background: var(--gris-clair);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .key-learnings h3 {
+            color: var(--vert-fonce);
+            font-size: 1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .key-learnings ul {
+            list-style: none;
+        }
+
+        .key-learnings li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .key-learnings li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--vert-lime);
+            font-weight: bold;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, var(--bleu-marine) 0%, #1e2d5c 100%);
+            color: var(--blanc);
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(39, 60, 134, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-area">
+                <div class="logo-badge">🥐</div>
+                <div class="header-title">Boulangeries Ange</div>
+            </div>
+            <div class="progress-area">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="score-display">
+                    <span class="score-icon">★</span>
+                    <span id="scoreDisplay">0 pts</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Intro Screen -->
+            <section class="screen intro-screen active" id="introScreen">
+                <div class="intro-card">
+                    <div class="intro-icon">📋</div>
+                    <h1 class="intro-title">Choisir les bons canaux de recrutement</h1>
+                    <p class="intro-subtitle">
+                        En tant que responsable de boulangerie Ange, vous devez recruter différents profils.<br>
+                        Sélectionnez les canaux adaptés selon le poste, l'urgence et le bassin d'emploi.
+                    </p>
+                    <div class="intro-context">
+                        <h3>💡 Ce que vous allez pratiquer</h3>
+                        <p>
+                            Vous serez confronté(e) à <strong>4 situations de recrutement</strong> concrètes. 
+                            Pour chacune, analysez le contexte et choisissez les canaux les plus pertinents parmi ceux proposés. 
+                            Plusieurs réponses sont attendues pour chaque scénario.
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" onclick="startActivity()">
+                        Commencer l'activité →
+                    </button>
+                </div>
+            </section>
+
+            <!-- Scenario Screen -->
+            <section class="screen scenario-screen" id="scenarioScreen">
+                <div class="scenario-left">
+                    <div class="scenario-number" id="scenarioNumber">Scénario 1/4</div>
+                    <h2 class="scenario-title" id="scenarioTitle">Titre du scénario</h2>
+                    <div class="scenario-context" id="scenarioContext">
+                        <!-- Context items will be injected here -->
+                    </div>
+                </div>
+                <div class="scenario-right">
+                    <p class="question-prompt">Quels canaux de recrutement privilégieriez-vous dans cette situation ?</p>
+                    <div class="channels-grid" id="channelsGrid">
+                        <!-- Channel cards will be injected here -->
+                    </div>
+                    <div class="action-area">
+                        <span class="selection-hint">
+                            <span class="selection-count" id="selectionCount">0</span> canal(aux) sélectionné(s)
+                        </span>
+                        <button class="btn btn-validate" id="validateBtn" onclick="validateAnswer()" disabled>
+                            Valider ma réponse
+                        </button>
+                    </div>
+                </div>
+                <!-- Feedback Overlay -->
+                <div class="feedback-overlay" id="feedbackOverlay">
+                    <div class="feedback-card">
+                        <div class="feedback-icon" id="feedbackIcon">✓</div>
+                        <h3 class="feedback-title" id="feedbackTitle">Excellent !</h3>
+                        <div class="points-badge" id="pointsBadge">+ 0 points</div>
+                        <p class="feedback-text" id="feedbackText">Explication...</p>
+                        <div class="feedback-details">
+                            <h4>📚 À retenir</h4>
+                            <p id="feedbackDetails">Détails...</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="nextScenario()">
+                            Continuer →
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Screen -->
+            <section class="screen results-screen" id="resultsScreen">
+                <div class="results-card">
+                    <div class="results-icon" id="resultsIcon">🏆</div>
+                    <h2 class="results-title">Activité terminée !</h2>
+                    <div class="results-score" id="finalScore">0/100</div>
+                    <p class="results-message" id="resultsMessage">Message de résultat...</p>
+                    <div class="key-learnings">
+                        <h3>💡 Points clés à retenir</h3>
+                        <ul>
+                            <li><strong>Postes peu spécialisés</strong> : privilégiez les jobboards généralistes et France Travail pour une large diffusion.</li>
+                            <li><strong>Profils techniques</strong> : utilisez les réseaux spécialisés et le sourcing proactif (LinkedIn).</li>
+                            <li><strong>Recrutement urgent</strong> : l'intérim et les viviers internes permettent une réponse rapide.</li>
+                            <li><strong>Bassin tendu</strong> : la cooptation et les partenariats écoles sont plus efficaces.</li>
+                            <li><strong>Stratégie multicanale</strong> : combinez plusieurs canaux pour maximiser vos chances.</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-restart" onclick="restartActivity()">
+                        ↻ Recommencer l'activité
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Data
+        const scenarios = [
+            {
+                id: 1,
+                title: "Recruter un boulanger expérimenté",
+                context: {
+                    poste: "Boulanger qualifié (CAP minimum, 3 ans d'expérience)",
+                    urgence: "Modérée – Départ prévu dans 2 mois",
+                    bassin: "Zone urbaine avec forte concurrence (région parisienne)"
+                },
+                channels: [
+                    { id: "jobboard", name: "France Travail", desc: "Diffusion large, gratuit, profils variés", icon: "🌐", correct: true },
+                    { id: "linkedin", name: "LinkedIn", desc: "Réseau professionnel, sourcing proactif", icon: "💼", correct: true },
+                    { id: "cooptation", name: "Cooptation", desc: "Recommandations par les employés actuels", icon: "🤝", correct: true },
+                    { id: "interim", name: "Intérim", desc: "Recrutement rapide, flexibilité", icon: "⚡", correct: false },
+                    { id: "ecoles", name: "Écoles & CFA", desc: "Jeunes diplômés, alternants", icon: "🎓", correct: false },
+                    { id: "specialise", name: "Sites spécialisés métiers de bouche", desc: "Candidats ciblés du secteur", icon: "🥖", correct: true }
+                ],
+                explanation: "Pour un profil qualifié et expérimenté en zone concurrentielle, la combinaison de canaux généralistes (France Travail) et spécialisés est optimale. La cooptation et LinkedIn permettent d'atteindre des candidats passifs qui ne cherchent pas activement. L'intérim n'est pas adapté pour un CDI prévu. Les écoles ciblent plutôt les débutants.",
+                points: 25
+            },
+            {
+                id: 2,
+                title: "Remplacement urgent d'un vendeur",
+                context: {
+                    poste: "Vendeur/Vendeuse en boulangerie (débutant accepté)",
+                    urgence: "Très urgent – Départ immédiat non anticipé",
+                    bassin: "Zone semi-rurale, bassin d'emploi restreint"
+                },
+                channels: [
+                    { id: "jobboard", name: "France Travail", desc: "Diffusion large, gratuit, profils variés", icon: "🌐", correct: true },
+                    { id: "linkedin", name: "LinkedIn", desc: "Réseau professionnel, sourcing proactif", icon: "💼", correct: false },
+                    { id: "cooptation", name: "Cooptation", desc: "Recommandations par les employés actuels", icon: "🤝", correct: true },
+                    { id: "interim", name: "Intérim", desc: "Recrutement rapide, flexibilité", icon: "⚡", correct: true },
+                    { id: "vitrine", name: "Affichage en vitrine", desc: "Visibilité locale, candidats de proximité", icon: "📍", correct: true },
+                    { id: "cabinet", name: "Cabinet de recrutement", desc: "Accompagnement expert, coût élevé", icon: "🏢", correct: false }
+                ],
+                explanation: "Pour un remplacement urgent d'un poste peu spécialisé en zone rurale, privilégiez les canaux rapides et locaux : l'intérim permet une embauche immédiate, l'affichage en vitrine cible les candidats de proximité, et la cooptation mobilise votre réseau local. LinkedIn et les cabinets sont surdimensionnés pour ce type de poste.",
+                points: 25
+            },
+            {
+                id: 3,
+                title: "Recrutement saisonnier pour l'été",
+                context: {
+                    poste: "Équipiers polyvalents (vente + préparation) – 5 postes",
+                    urgence: "Anticipée – Besoins d'ici 3 mois",
+                    bassin: "Zone touristique côtière, forte saisonnalité"
+                },
+                channels: [
+                    { id: "jobboard", name: "France Travail", desc: "Diffusion large, gratuit, profils variés", icon: "🌐", correct: true },
+                    { id: "interim", name: "Intérim", desc: "Recrutement rapide, flexibilité", icon: "⚡", correct: true },
+                    { id: "ecoles", name: "Écoles & Universités", desc: "Étudiants disponibles pendant les vacances", icon: "🎓", correct: true },
+                    { id: "reseaux", name: "Réseaux sociaux (Facebook, Instagram)", desc: "Communication ciblée, jeunes candidats", icon: "📱", correct: true },
+                    { id: "cabinet", name: "Cabinet de recrutement", desc: "Accompagnement expert, coût élevé", icon: "🏢", correct: false },
+                    { id: "linkedin", name: "LinkedIn", desc: "Réseau professionnel, sourcing proactif", icon: "💼", correct: false }
+                ],
+                explanation: "Pour des postes saisonniers en volume, ciblez les canaux attractifs pour les jeunes et les étudiants : réseaux sociaux pour leur visibilité auprès de cette cible, partenariats écoles pour les jobs d'été, et France Travail pour la diffusion large. L'intérim offre la flexibilité nécessaire. Les cabinets et LinkedIn sont inadaptés pour ces profils et ces volumes.",
+                points: 25
+            },
+            {
+                id: 4,
+                title: "Recruter un responsable de boulangerie",
+                context: {
+                    poste: "Responsable de boulangerie (management + gestion)",
+                    urgence: "Modérée – Création de poste, ouverture dans 4 mois",
+                    bassin: "Grande agglomération, marché de l'emploi dynamique"
+                },
+                channels: [
+                    { id: "linkedin", name: "LinkedIn", desc: "Réseau professionnel, sourcing proactif", icon: "💼", correct: true },
+                    { id: "cooptation", name: "Cooptation", desc: "Recommandations par le réseau Ange", icon: "🤝", correct: true },
+                    { id: "jobboard", name: "France Travail / Indeed", desc: "Diffusion large, profils variés", icon: "🌐", correct: true },
+                    { id: "interim", name: "Intérim", desc: "Recrutement rapide, flexibilité", icon: "⚡", correct: false },
+                    { id: "vitrine", name: "Affichage en vitrine", desc: "Visibilité locale, candidats de proximité", icon: "📍", correct: false },
+                    { id: "specialise", name: "Sites spécialisés retail/management", desc: "Profils managers expérimentés", icon: "🎯", correct: true }
+                ],
+                explanation: "Pour un poste de responsable, misez sur les canaux professionnels qui attirent des profils expérimentés : LinkedIn pour le sourcing proactif de managers, les sites spécialisés retail pour des profils ciblés, et la cooptation au sein du réseau Ange. France Travail complète pour la visibilité. L'affichage vitrine et l'intérim ne conviennent pas à un poste cadre en CDI.",
+                points: 25
+            }
+        ];
+
+        // State
+        let currentScenario = 0;
+        let score = 0;
+        let selectedChannels = [];
+
+        // Functions
+        function startActivity() {
+            document.getElementById('introScreen').classList.remove('active');
+            document.getElementById('scenarioScreen').classList.add('active');
+            loadScenario(0);
+        }
+
+        function loadScenario(index) {
+            const scenario = scenarios[index];
+            currentScenario = index;
+            selectedChannels = [];
+
+            // Update header
+            document.getElementById('scenarioNumber').textContent = `Scénario ${index + 1}/${scenarios.length}`;
+            document.getElementById('scenarioTitle').textContent = scenario.title;
+
+            // Update context
+            const contextHTML = `
+                <div class="context-item">
+                    <div class="context-icon">👤</div>
+                    <div class="context-text">
+                        <div class="context-label">Poste à pourvoir</div>
+                        <div class="context-value">${scenario.context.poste}</div>
+                    </div>
+                </div>
+                <div class="context-item">
+                    <div class="context-icon">⏱️</div>
+                    <div class="context-text">
+                        <div class="context-label">Niveau d'urgence</div>
+                        <div class="context-value">${scenario.context.urgence}</div>
+                    </div>
+                </div>
+                <div class="context-item">
+                    <div class="context-icon">📍</div>
+                    <div class="context-text">
+                        <div class="context-label">Bassin d'emploi</div>
+                        <div class="context-value">${scenario.context.bassin}</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('scenarioContext').innerHTML = contextHTML;
+
+            // Update channels
+            const shuffledChannels = [...scenario.channels].sort(() => Math.random() - 0.5);
+            const channelsHTML = shuffledChannels.map(channel => `
+                <div class="channel-card" data-id="${channel.id}" onclick="toggleChannel('${channel.id}')">
+                    <div class="channel-icon">${channel.icon}</div>
+                    <div class="channel-name">${channel.name}</div>
+                    <div class="channel-desc">${channel.desc}</div>
+                </div>
+            `).join('');
+            document.getElementById('channelsGrid').innerHTML = channelsHTML;
+
+            // Reset UI
+            document.getElementById('selectionCount').textContent = '0';
+            document.getElementById('validateBtn').disabled = true;
+            updateProgress();
+        }
+
+        function toggleChannel(channelId) {
+            const card = document.querySelector(`.channel-card[data-id="${channelId}"]`);
+            
+            if (selectedChannels.includes(channelId)) {
+                selectedChannels = selectedChannels.filter(id => id !== channelId);
+                card.classList.remove('selected');
+            } else {
+                selectedChannels.push(channelId);
+                card.classList.add('selected');
+            }
+
+            document.getElementById('selectionCount').textContent = selectedChannels.length;
+            document.getElementById('validateBtn').disabled = selectedChannels.length === 0;
+        }
+
+        function validateAnswer() {
+            const scenario = scenarios[currentScenario];
+            const correctChannels = scenario.channels.filter(c => c.correct).map(c => c.id);
+            
+            let correctSelections = 0;
+            let incorrectSelections = 0;
+            let missedSelections = 0;
+
+            // Mark cards
+            document.querySelectorAll('.channel-card').forEach(card => {
+                const channelId = card.dataset.id;
+                const isCorrect = correctChannels.includes(channelId);
+                const isSelected = selectedChannels.includes(channelId);
+
+                card.style.pointerEvents = 'none';
+
+                if (isSelected && isCorrect) {
+                    card.classList.add('correct');
+                    correctSelections++;
+                } else if (isSelected && !isCorrect) {
+                    card.classList.add('incorrect');
+                    incorrectSelections++;
+                } else if (!isSelected && isCorrect) {
+                    card.classList.add('missed');
+                    missedSelections++;
+                }
+            });
+
+            // Calculate points
+            const maxPoints = scenario.points;
+            const totalCorrect = correctChannels.length;
+            const pointsEarned = Math.max(0, Math.round((correctSelections / totalCorrect) * maxPoints - (incorrectSelections * 3)));
+            score += pointsEarned;
+
+            // Update score display
+            document.getElementById('scoreDisplay').textContent = `${score} pts`;
+
+            // Show feedback
+            showFeedback(correctSelections, incorrectSelections, missedSelections, pointsEarned, scenario.explanation);
+        }
+
+        function showFeedback(correct, incorrect, missed, points, explanation) {
+            const overlay = document.getElementById('feedbackOverlay');
+            const icon = document.getElementById('feedbackIcon');
+            const title = document.getElementById('feedbackTitle');
+            const pointsBadge = document.getElementById('pointsBadge');
+            const text = document.getElementById('feedbackText');
+            const details = document.getElementById('feedbackDetails');
+
+            if (incorrect === 0 && missed === 0) {
+                icon.className = 'feedback-icon success';
+                icon.textContent = '✓';
+                title.textContent = 'Excellent !';
+                text.textContent = 'Vous avez identifié tous les canaux pertinents sans erreur.';
+            } else if (correct > incorrect && missed <= 1) {
+                icon.className = 'feedback-icon partial';
+                icon.textContent = '◐';
+                title.textContent = 'Bien joué !';
+                text.textContent = `Vous avez trouvé la plupart des bons canaux. ${missed > 0 ? `Il en manquait ${missed}.` : ''} ${incorrect > 0 ? `${incorrect} choix ${incorrect > 1 ? 'étaient' : 'était'} moins pertinent${incorrect > 1 ? 's' : ''}.` : ''}`;
+            } else {
+                icon.className = 'feedback-icon error';
+                icon.textContent = '✗';
+                title.textContent = 'À améliorer';
+                text.textContent = 'Revoyez les critères de sélection des canaux selon le contexte.';
+            }
+
+            pointsBadge.textContent = `+ ${points} points`;
+            details.textContent = explanation;
+
+            overlay.classList.add('show');
+        }
+
+        function nextScenario() {
+            document.getElementById('feedbackOverlay').classList.remove('show');
+
+            if (currentScenario < scenarios.length - 1) {
+                loadScenario(currentScenario + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('scenarioScreen').classList.remove('active');
+            document.getElementById('resultsScreen').classList.add('active');
+
+            const maxScore = scenarios.reduce((sum, s) => sum + s.points, 0);
+            const percentage = Math.round((score / maxScore) * 100);
+
+            document.getElementById('finalScore').textContent = `${score}/${maxScore}`;
+
+            const icon = document.getElementById('resultsIcon');
+            const message = document.getElementById('resultsMessage');
+
+            if (percentage >= 80) {
+                icon.className = 'results-icon excellent';
+                icon.textContent = '🏆';
+                message.textContent = 'Félicitations ! Vous maîtrisez parfaitement la sélection des canaux de recrutement selon le contexte. Vous êtes prêt(e) à optimiser vos recrutements chez Boulangeries Ange.';
+            } else if (percentage >= 50) {
+                icon.className = 'results-icon good';
+                icon.textContent = '👍';
+                message.textContent = 'Bon travail ! Vous avez une bonne compréhension des canaux de recrutement. Quelques ajustements vous permettront d\'être encore plus efficace.';
+            } else {
+                icon.className = 'results-icon needs-work';
+                icon.textContent = '📚';
+                message.textContent = 'Continuez à vous entraîner ! La sélection des canaux dépend de nombreux facteurs : nature du poste, urgence et bassin d\'emploi. Relisez les points clés ci-dessous.';
+            }
+
+            updateProgress();
+        }
+
+        function restartActivity() {
+            score = 0;
+            currentScenario = 0;
+            selectedChannels = [];
+            document.getElementById('scoreDisplay').textContent = '0 pts';
+            document.getElementById('resultsScreen').classList.remove('active');
+            document.getElementById('introScreen').classList.add('active');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = ((currentScenario + 1) / scenarios.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+    </script>
+</body>
+</html>
