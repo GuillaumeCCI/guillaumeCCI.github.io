@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portefeuille de Preuves - Dialogue et Quiz</title>
+    <title>Dialogue Conseiller - Candidat</title>
     <style>
         * {
             margin: 0;
@@ -25,205 +25,232 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            padding: 40px;
+            gap: 40px;
         }
 
-        .content-box {
-            width: 1400px;
-            height: 900px;
-            background: white;
-            border-radius: 30px;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
+        /* Section gauche : Audio + Transcription */
+        .left-section {
+            width: 55%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
         }
 
-        /* Navigation arrows */
-        .nav-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 70px;
-            height: 70px;
+        /* Lecteur Audio */
+        .audio-section {
             background: white;
-            border: none;
-            border-radius: 50%;
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .audio-title {
             font-size: 28px;
+            color: #667eea;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .play-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
             cursor: pointer;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #667eea;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
         }
 
-        .nav-arrow:hover {
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .play-btn svg {
+            width: 35px;
+            height: 35px;
+            fill: white;
+        }
+
+        .progress-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .progress-bar-wrapper {
+            width: 100%;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.1s linear;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .speed-btn {
+            padding: 8px 15px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .speed-btn.active, .speed-btn:hover {
             background: #667eea;
             color: white;
         }
 
-        .nav-arrow:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            transform: translateY(-50%) scale(1);
-        }
-
-        .nav-arrow:disabled:hover {
-            background: white;
-            color: #667eea;
-        }
-
-        .nav-prev { left: 40px; }
-        .nav-next { right: 40px; }
-
-        /* Slides container */
-        .slides-wrapper {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        .slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 50px 60px;
-            display: none;
-            flex-direction: column;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .slide.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        /* Page indicator */
-        .page-indicator {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 12px;
-            z-index: 50;
-        }
-
-        .page-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #ddd;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .page-dot.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transform: scale(1.2);
-        }
-
-        .page-dot:hover {
-            background: #667eea;
-        }
-
-        /* Dialogue styles */
-        .slide-title {
-            text-align: center;
-            color: #667eea;
-            font-size: 32px;
-            margin-bottom: 40px;
-            font-weight: 600;
-        }
-
-        .messages-container {
+        /* Transcription */
+        .transcription-section {
             flex: 1;
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            gap: 25px;
+            overflow: hidden;
         }
 
-        .message {
-            padding: 25px 30px;
-            border-radius: 20px;
-            line-height: 1.8;
-            font-size: 20px;
-            max-width: 85%;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .candidat {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-left: 6px solid #2196F3;
-            align-self: flex-start;
-        }
-
-        .conseiller {
-            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-            border-left: 6px solid #9c27b0;
-            align-self: flex-end;
-        }
-
-        .speaker {
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 18px;
+        .transcription-title {
+            font-size: 22px;
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .speaker-icon {
-            font-size: 24px;
-        }
-
-        /* Quiz styles */
-        .quiz-title {
-            text-align: center;
-            color: #764ba2;
-            font-size: 32px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .quiz-subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 40px;
-            font-size: 18px;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
+        .transcription-content {
             flex: 1;
-            align-content: center;
+            overflow-y: auto;
+            padding-right: 15px;
+            line-height: 1.8;
+            font-size: 16px;
         }
 
-        .cards-grid.second-row {
-            grid-template-columns: repeat(3, 1fr);
-            max-width: 900px;
-            margin: 0 auto;
+        .transcription-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .transcription-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .transcription-content::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .dialogue-line {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+
+        .dialogue-line.active {
+            background: #f3e5f5;
+        }
+
+        .dialogue-line.conseiller {
+            border-left: 4px solid #9c27b0;
+        }
+
+        .dialogue-line.candidat {
+            border-left: 4px solid #2196F3;
+        }
+
+        .speaker-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .speaker-name.conseiller { color: #9c27b0; }
+        .speaker-name.candidat { color: #2196F3; }
+
+        /* Section droite : Flashcards */
+        .right-section {
+            width: 45%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .flashcards-title {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .flashcards-title h2 {
+            font-size: 26px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .flashcards-title p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .flashcards-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .flashcard {
+            flex: 1;
             perspective: 1000px;
-            height: 220px;
             cursor: pointer;
         }
 
@@ -245,360 +272,403 @@
             height: 100%;
             backface-visibility: hidden;
             border-radius: 20px;
-            padding: 25px;
+            padding: 25px 30px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            text-align: center;
-            font-weight: 500;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         }
 
         .flashcard-front {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-size: 18px;
-            line-height: 1.5;
         }
 
         .flashcard-back {
             background: white;
-            color: #333;
             transform: rotateY(180deg);
-            font-size: 15px;
-            line-height: 1.6;
             border: 3px solid #667eea;
-            flex-direction: column;
-            gap: 10px;
         }
 
         .flashcard.correct .flashcard-back {
-            border-color: #11998e;
+            border-color: #4CAF50;
             background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
         }
 
         .flashcard.incorrect .flashcard-back {
-            border-color: #eb3349;
+            border-color: #f44336;
             background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
         }
 
-        .result-icon {
-            font-size: 36px;
+        .card-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            opacity: 0.9;
         }
 
-        .score-display {
-            text-align: center;
-            font-size: 22px;
+        .flashcard-front .card-label {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .flashcard-back .card-label {
             color: #667eea;
-            font-weight: 600;
-            margin-top: 30px;
         }
 
-        .reset-btn {
-            display: block;
-            margin: 20px auto 0;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 30px;
+        .flashcard.correct .flashcard-back .card-label {
+            color: #4CAF50;
+        }
+
+        .flashcard.incorrect .flashcard-back .card-label {
+            color: #f44336;
+        }
+
+        .card-content {
             font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
+            line-height: 1.6;
         }
 
-        .reset-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        .flashcard-front .card-content {
+            font-weight: 500;
         }
 
-        /* Progress bar */
-        .progress-container {
+        .flashcard-back .card-content {
+            color: #333;
+        }
+
+        .card-badge {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background: #eee;
+            top: 15px;
+            right: 15px;
+            font-size: 28px;
         }
 
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.4s ease;
+        .flip-hint {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 13px;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .flip-hint svg {
+            width: 16px;
+            height: 16px;
         }
     </style>
 </head>
 <body>
     <div class="main-container">
-        <button class="nav-arrow nav-prev" onclick="prevSlide()" id="prevBtn">◀</button>
-        
-        <div class="content-box">
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-
-            <div class="slides-wrapper" id="slidesWrapper">
-                <!-- Slide 1: Introduction -->
-                <div class="slide active" data-slide="0">
-                    <h1 class="slide-title">🎯 Entretien avec un conseiller</h1>
-                    <div class="messages-container">
-                        <div class="message candidat">
-                            <div class="speaker"><span class="speaker-icon">👤</span> Le Candidat</div>
-                            <p>Bonjour... Je dois vous avouer que je suis un peu stressé. J'ai vu qu'il fallait passer une certification, et franchement, l'idée de repasser un examen écrit... ça ne m'enchante pas vraiment. L'école, c'est loin pour moi, et j'ai jamais été très à l'aise avec la rédaction.</p>
+        <!-- Section Gauche : Audio + Transcription -->
+        <div class="left-section">
+            <!-- Lecteur Audio -->
+            <div class="audio-section">
+                <h2 class="audio-title">🎧 Écoutez le dialogue</h2>
+                <div class="audio-controls">
+                    <button class="play-btn" id="playBtn" onclick="togglePlay()">
+                        <svg id="playIcon" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <svg id="pauseIcon" style="display:none" viewBox="0 0 24 24">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </button>
+                    <div class="progress-container">
+                        <div class="progress-bar-wrapper" onclick="seekAudio(event)">
+                            <div class="progress-bar" id="progressBar"></div>
                         </div>
-                        <div class="message conseiller">
-                            <div class="speaker"><span class="speaker-icon">💼</span> Le Conseiller</div>
-                            <p>Je vous comprends tout à fait, et vous savez, vous n'êtes pas le seul dans cette situation. C'est justement pour ça qu'on a développé une approche différente. Plutôt que de vous mettre devant une feuille blanche avec un sujet à traiter en 4 heures, on peut travailler autrement.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 2 -->
-                <div class="slide" data-slide="1">
-                    <h1 class="slide-title">🎯 Entretien avec un conseiller</h1>
-                    <div class="messages-container">
-                        <div class="message candidat">
-                            <div class="speaker"><span class="speaker-icon">👤</span> Le Candidat</div>
-                            <p>Ah bon ? Comment ça marche alors ?</p>
-                        </div>
-                        <div class="message conseiller">
-                            <div class="speaker"><span class="speaker-icon">💼</span> Le Conseiller</div>
-                            <p>On appelle ça un <strong>portefeuille de preuves</strong>. Concrètement, au lieu de tout faire en une seule fois, vous allez rassembler petit à petit des éléments qui montrent ce que vous savez faire dans votre travail quotidien. Ça peut être des captures d'écran d'un projet que vous avez mené, des documents que vous avez produits, des photos d'une installation que vous avez réalisée... Des choses bien concrètes, quoi.</p>
+                        <div class="time-display">
+                            <span id="currentTime">0:00</span>
+                            <span id="totalTime">0:00</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- Slide 3 -->
-                <div class="slide" data-slide="2">
-                    <h1 class="slide-title">🎯 Entretien avec un conseiller</h1>
-                    <div class="messages-container">
-                        <div class="message candidat">
-                            <div class="speaker"><span class="speaker-icon">👤</span> Le Candidat</div>
-                            <p>Donc je ne serais pas bloqué pendant des heures à rédiger un truc ?</p>
-                        </div>
-                        <div class="message conseiller">
-                            <div class="speaker"><span class="speaker-icon">💼</span> Le Conseiller</div>
-                            <p>Exactement ! Vous travaillez à votre rythme, tranquillement. On se voit de temps en temps pour faire le point ensemble, voir ce que vous avez collecté, et je vous guide sur ce qu'il manque éventuellement. Pas de pression d'un examen où tout se joue en quelques heures.</p>
-                        </div>
+                    <div class="speed-control">
+                        <span>Vitesse :</span>
+                        <button class="speed-btn" onclick="setSpeed(0.75)">0.75x</button>
+                        <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
+                        <button class="speed-btn" onclick="setSpeed(1.25)">1.25x</button>
                     </div>
-                </div>
-
-                <!-- Slide 4 -->
-                <div class="slide" data-slide="3">
-                    <h1 class="slide-title">🎯 Entretien avec un conseiller</h1>
-                    <div class="messages-container">
-                        <div class="message candidat">
-                            <div class="speaker"><span class="speaker-icon">👤</span> Le Candidat</div>
-                            <p>Et mon entreprise, ils vont accepter ça ? Parce que déjà, ils ne sont pas super chauds pour me libérer une journée complète...</p>
-                        </div>
-                        <div class="message conseiller">
-                            <div class="speaker"><span class="speaker-icon">💼</span> Le Conseiller</div>
-                            <p>C'est là que c'est intéressant ! Comme vous constituez votre portefeuille sur plusieurs semaines ou mois, il n'y a pas besoin de vous mobiliser toute une journée d'un coup. Et pour l'évaluation finale, on peut même faire ça en visio si c'est plus simple pour vous et pour votre entreprise. Pas besoin de vous déplacer, pas besoin d'organiser une salle d'examen avec surveillance... On s'adapte.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 5 -->
-                <div class="slide" data-slide="4">
-                    <h1 class="slide-title">🎯 Entretien avec un conseiller</h1>
-                    <div class="messages-container">
-                        <div class="message candidat">
-                            <div class="speaker"><span class="speaker-icon">👤</span> Le Candidat</div>
-                            <p>Ah, ça change tout ! Et si j'ai des questions en cours de route, je peux vous contacter ?</p>
-                        </div>
-                        <div class="message conseiller">
-                            <div class="speaker"><span class="speaker-icon">💼</span> Le Conseiller</div>
-                            <p>Bien sûr ! C'est même recommandé. Je suis là pour vous accompagner tout au long du processus. Si vous avez un doute sur une preuve à apporter, si vous ne savez pas comment présenter quelque chose, on en discute. L'idée, c'est vraiment de valoriser ce que vous faites au quotidien, pas de vous piéger.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 6 -->
-                <div class="slide" data-slide="5">
-                    <h1 class="slide-title">🎯 Entretien avec un conseiller</h1>
-                    <div class="messages-container">
-                        <div class="message candidat">
-                            <div class="speaker"><span class="speaker-icon">👤</span> Le Candidat</div>
-                            <p>Bon, dit comme ça, ça me rassure beaucoup ! Je me sens moins bloqué par l'idée de la certification maintenant.</p>
-                        </div>
-                        <div class="message conseiller">
-                            <div class="speaker"><span class="speaker-icon">💼</span> Le Conseiller</div>
-                            <p>Parfait ! On va pouvoir commencer à construire votre dossier ensemble. Vous allez voir, c'est beaucoup plus naturel que vous ne le pensez.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 7: Quiz -->
-                <div class="slide" data-slide="6">
-                    <h2 class="quiz-title">📚 Testez vos connaissances !</h2>
-                    <p class="quiz-subtitle">Cliquez sur les cartes pour révéler les explications. Identifiez les vrais avantages du portefeuille de preuves.</p>
-                    
-                    <div class="cards-grid" id="cardsGrid"></div>
-                    
-                    <div class="score-display" id="score">Cartes retournées : 0 / 7</div>
-                    <button class="reset-btn" onclick="resetQuiz()">🔄 Recommencer le quiz</button>
                 </div>
             </div>
 
-            <div class="page-indicator" id="pageIndicator"></div>
+            <!-- Transcription -->
+            <div class="transcription-section">
+                <h3 class="transcription-title">📝 Transcription du dialogue</h3>
+                <div class="transcription-content" id="transcription"></div>
+            </div>
         </div>
 
-        <button class="nav-arrow nav-next" onclick="nextSlide()" id="nextBtn">▶</button>
+        <!-- Section Droite : Flashcards -->
+        <div class="right-section">
+            <div class="flashcards-title">
+                <h2>🃏 Testez vos connaissances</h2>
+                <p>Cliquez sur les cartes pour les retourner</p>
+            </div>
+            <div class="flashcards-container" id="flashcardsContainer"></div>
+        </div>
     </div>
 
     <script>
-        let currentSlide = 0;
-        const totalSlides = 7;
-        let flippedCount = 0;
+        // Dialogue data
+        const dialogueLines = [
+            { speaker: "conseiller", text: "Bonjour, merci d'être là. Avant de parler du dispositif, j'aimerais comprendre votre situation. Qu'est-ce qui vous motive à passer ce certificat ?" },
+            { speaker: "candidat", text: "J'ai envie de faire reconnaître ce que je fais au travail… mais je vous le dis tout de suite : l'école, ça fait longtemps. Et la rédaction, je ne suis pas à l'aise." },
+            { speaker: "conseiller", text: "C'est important que vous me le disiez. Quand vous dites \"rédaction\", c'est plutôt le fait d'écrire longtemps, de structurer, ou la peur de \"faire faux\" ?" },
+            { speaker: "candidat", text: "Un peu tout. Je peux expliquer à l'oral, mais écrire une page… je bloque. Et je n'ai pas envie de me retrouver \"en examen\"." },
+            { speaker: "conseiller", text: "D'accord. On va donc éviter une approche qui vous met en difficulté sur ce point. Est-ce que dans votre travail, vous avez des choses concrètes qui montrent ce que vous faites : traces, documents, outils, captures, exemples ?" },
+            { speaker: "candidat", text: "Oui. Je gère des commandes, j'ai des mails, des tableaux, des photos, des captures d'écran… et parfois des retours clients." },
+            { speaker: "conseiller", text: "Parfait. Ce type d'éléments peut justement servir à appuyer votre démarche. L'idée, ce n'est pas de vous demander de \"raconter l'école\", mais de partir de votre réalité de terrain." },
+            { speaker: "candidat", text: "Donc je ne vais pas devoir rédiger un gros dossier ?" },
+            { speaker: "conseiller", text: "Non. On peut partir sur quelque chose qui se construit progressivement, à partir de preuves liées à votre activité. Vous avancez étape par étape, et on fait des points à des moments clés." },
+            { speaker: "candidat", text: "Ça me rassure… parce que je travaille, je ne peux pas me bloquer une semaine entière." },
+            { speaker: "conseiller", text: "Je comprends. Là, vous pouvez organiser votre progression en fonction de vos contraintes. Et si c'est plus simple pour vous, une partie des échanges peut aussi se faire à distance." },
+            { speaker: "candidat", text: "À distance, c'est possible ?" },
+            { speaker: "conseiller", text: "Oui, selon les modalités prévues, on peut faire un entretien en visio. L'important c'est que vous puissiez expliquer ce que vous avez produit ou choisi comme éléments." },
+            { speaker: "candidat", text: "Je préfère largement. Parce qu'à l'oral, je me débrouille." },
+            { speaker: "conseiller", text: "C'est justement pour ça qu'on prend le temps de choisir le bon format avec vous. Et si vous avez besoin, vous n'êtes pas seul : il y a un accompagnement possible pour vous aider à sélectionner les éléments et à les rendre exploitables." },
+            { speaker: "candidat", text: "Là, je me vois le faire. Si je peux m'appuyer sur ce que je fais déjà, et pas sur des dissertations…" },
+            { speaker: "conseiller", text: "C'est exactement l'objectif : partir de votre pratique et la rendre lisible, sans vous imposer un cadre trop scolaire." }
+        ];
 
-        const cards = [
+        // Flashcards data
+        const flashcards = [
             {
-                question: "Travail personnel étalé dans le temps",
-                answer: "Le portefeuille de preuves permet de répartir le travail sur plusieurs semaines ou mois, plutôt qu'un examen concentré sur une seule journée.",
+                front: "Le portefeuille de preuves permet une organisation plus souple du parcours de certification.",
+                back: "Cette modalité repose sur un travail étalé dans le temps, compatible avec l'activité professionnelle. Elle ne nécessite pas une mobilisation continue ou une session longue, et peut s'adapter aux contraintes de planning des candidats et des entreprises.",
                 correct: true
             },
             {
-                question: "Adapté aux profils en difficulté avec l'écrit",
-                answer: "Cette modalité convient particulièrement aux publics techniques ou opérationnels en inconfort avec un examen formel écrit.",
+                front: "Le portefeuille de preuves valorise des situations professionnelles réelles.",
+                back: "Les compétences sont démontrées à partir d'éléments issus de l'activité effective, tels que des productions, documents ou traces de travail. Cette approche limite le recours à des formats scolaires ou théoriques et s'appuie sur des preuves concrètes.",
                 correct: true
             },
             {
-                question: "Utilisation de preuves concrètes et simples",
-                answer: "Les preuves peuvent être des captures d'écran, des photos, des documents professionnels réels... Pas de dossiers complexes !",
-                correct: true
-            },
-            {
-                question: "Nécessite un examen surveillé en présentiel",
-                answer: "Au contraire ! Le portefeuille peut être évalué à distance en visioconférence, sans dispositifs de surveillance lourds.",
+                front: "Le portefeuille de preuves ne nécessite ni préparation ni accompagnement.",
+                back: "Cette affirmation est incorrecte. Le portefeuille de preuves implique un travail de sélection et de structuration des éléments présentés. Un accompagnement peut être mobilisé pour sécuriser cette démarche et faciliter la compréhension des attendus.",
                 correct: false
-            },
-            {
-                question: "Accompagnement du candidat possible",
-                answer: "Le candidat bénéficie d'un accompagnement tout au long du processus, avec des points d'échange réguliers.",
-                correct: true
-            },
-            {
-                question: "Évaluation possible en distanciel",
-                answer: "Le portefeuille peut être évalué à distance via visioconférence, facilitant l'organisation et évitant les déplacements.",
-                correct: true
-            },
-            {
-                question: "Compatible avec les contraintes des entreprises",
-                answer: "Cette modalité s'adapte aux contraintes des entreprises : pas d'immobilisation longue des salariés.",
-                correct: true
             }
         ];
 
-        // Initialize page indicator
-        function initPageIndicator() {
-            const indicator = document.getElementById('pageIndicator');
-            indicator.innerHTML = '';
-            for (let i = 0; i < totalSlides; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'page-dot' + (i === 0 ? ' active' : '');
-                dot.onclick = () => goToSlide(i);
-                indicator.appendChild(dot);
-            }
-        }
+        // Audio state
+        let isPlaying = false;
+        let currentUtterance = null;
+        let currentLineIndex = 0;
+        let speechRate = 1;
+        let isPaused = false;
+        let totalDuration = 0;
+        let elapsedTime = 0;
+        let progressInterval = null;
 
-        function updateUI() {
-            // Update slides
-            document.querySelectorAll('.slide').forEach((slide, index) => {
-                slide.classList.toggle('active', index === currentSlide);
+        // Initialize transcription
+        function initTranscription() {
+            const container = document.getElementById('transcription');
+            dialogueLines.forEach((line, index) => {
+                const div = document.createElement('div');
+                div.className = `dialogue-line ${line.speaker}`;
+                div.id = `line-${index}`;
+                div.innerHTML = `
+                    <div class="speaker-name ${line.speaker}">${line.speaker === 'conseiller' ? '💼 Conseiller' : '👤 Candidat'}</div>
+                    <div>${line.text}</div>
+                `;
+                container.appendChild(div);
             });
-
-            // Update dots
-            document.querySelectorAll('.page-dot').forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
-            });
-
-            // Update progress bar
-            const progress = ((currentSlide + 1) / totalSlides) * 100;
-            document.getElementById('progressBar').style.width = progress + '%';
-
-            // Update arrows
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
         }
 
-        function nextSlide() {
-            if (currentSlide < totalSlides - 1) {
-                currentSlide++;
-                updateUI();
-            }
-        }
-
-        function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateUI();
-            }
-        }
-
-        function goToSlide(index) {
-            currentSlide = index;
-            updateUI();
-        }
-
-        // Quiz functions
-        function createCards() {
-            const grid = document.getElementById('cardsGrid');
-            grid.innerHTML = '';
-            
-            const shuffledCards = [...cards].sort(() => Math.random() - 0.5);
-            
-            shuffledCards.forEach((card) => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'flashcard';
-                cardElement.innerHTML = `
+        // Initialize flashcards
+        function initFlashcards() {
+            const container = document.getElementById('flashcardsContainer');
+            flashcards.forEach((card, index) => {
+                const div = document.createElement('div');
+                div.className = `flashcard ${card.correct ? 'correct' : 'incorrect'}`;
+                div.innerHTML = `
                     <div class="flashcard-inner">
                         <div class="flashcard-front">
-                            ${card.question}
+                            <span class="card-badge">${card.correct ? '✅' : '❌'}</span>
+                            <div class="card-label">AFFIRMATION ${index + 1}</div>
+                            <div class="card-content">${card.front}</div>
+                            <div class="flip-hint">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                                Cliquez pour retourner
+                            </div>
                         </div>
                         <div class="flashcard-back">
-                            <span class="result-icon">${card.correct ? '✅' : '❌'}</span>
-                            <span>${card.correct ? 'VRAI AVANTAGE' : 'FAUX'}</span>
-                            <p>${card.answer}</p>
+                            <span class="card-badge">${card.correct ? '✅' : '❌'}</span>
+                            <div class="card-label">${card.correct ? 'VRAI' : 'FAUX'} — EXPLICATION</div>
+                            <div class="card-content">${card.back}</div>
+                            <div class="flip-hint">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                                Cliquez pour retourner
+                            </div>
                         </div>
                     </div>
                 `;
-                
-                cardElement.addEventListener('click', function() {
-                    if (!this.classList.contains('flipped')) {
-                        this.classList.add('flipped');
-                        this.classList.add(card.correct ? 'correct' : 'incorrect');
-                        flippedCount++;
-                        updateScore();
-                    }
+                div.addEventListener('click', () => {
+                    div.classList.toggle('flipped');
                 });
-                
-                grid.appendChild(cardElement);
+                container.appendChild(div);
             });
         }
 
-        function updateScore() {
-            document.getElementById('score').textContent = 
-                `Cartes retournées : ${flippedCount} / ${cards.length}`;
+        // Calculate estimated duration
+        function calculateDuration() {
+            const totalChars = dialogueLines.reduce((sum, line) => sum + line.text.length, 0);
+            // Approximate: 15 characters per second at normal speed
+            totalDuration = Math.ceil(totalChars / 15);
+            document.getElementById('totalTime').textContent = formatTime(totalDuration);
         }
 
-        function resetQuiz() {
-            flippedCount = 0;
-            createCards();
-            updateScore();
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') nextSlide();
-            if (e.key === 'ArrowLeft') prevSlide();
-        });
+        // Speech synthesis
+        function speakLine(index) {
+            if (index >= dialogueLines.length) {
+                stopAudio();
+                return;
+            }
+
+            currentLineIndex = index;
+            highlightLine(index);
+
+            const line = dialogueLines[index];
+            currentUtterance = new SpeechSynthesisUtterance(line.text);
+            currentUtterance.lang = 'fr-FR';
+            currentUtterance.rate = speechRate;
+            
+            // Different pitch for different speakers
+            currentUtterance.pitch = line.speaker === 'conseiller' ? 0.9 : 1.1;
+
+            currentUtterance.onend = () => {
+                if (isPlaying && !isPaused) {
+                    speakLine(index + 1);
+                }
+            };
+
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        function highlightLine(index) {
+            // Remove previous highlight
+            document.querySelectorAll('.dialogue-line').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Add new highlight
+            const lineEl = document.getElementById(`line-${index}`);
+            if (lineEl) {
+                lineEl.classList.add('active');
+                lineEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                pauseAudio();
+            } else {
+                playAudio();
+            }
+        }
+
+        function playAudio() {
+            isPlaying = true;
+            isPaused = false;
+            document.getElementById('playIcon').style.display = 'none';
+            document.getElementById('pauseIcon').style.display = 'block';
+
+            if (speechSynthesis.paused) {
+                speechSynthesis.resume();
+            } else {
+                speakLine(currentLineIndex);
+            }
+
+            // Start progress tracking
+            progressInterval = setInterval(updateProgress, 100);
+        }
+
+        function pauseAudio() {
+            isPlaying = false;
+            isPaused = true;
+            document.getElementById('playIcon').style.display = 'block';
+            document.getElementById('pauseIcon').style.display = 'none';
+            
+            speechSynthesis.pause();
+            clearInterval(progressInterval);
+        }
+
+        function stopAudio() {
+            isPlaying = false;
+            isPaused = false;
+            currentLineIndex = 0;
+            elapsedTime = 0;
+            document.getElementById('playIcon').style.display = 'block';
+            document.getElementById('pauseIcon').style.display = 'none';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('currentTime').textContent = '0:00';
+            
+            speechSynthesis.cancel();
+            clearInterval(progressInterval);
+            
+            document.querySelectorAll('.dialogue-line').forEach(el => {
+                el.classList.remove('active');
+            });
+        }
+
+        function updateProgress() {
+            if (isPlaying) {
+                elapsedTime += 0.1;
+                const progress = Math.min((elapsedTime / totalDuration) * 100, 100);
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('currentTime').textContent = formatTime(elapsedTime);
+            }
+        }
+
+        function seekAudio(event) {
+            const wrapper = event.currentTarget;
+            const rect = wrapper.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            
+            // Calculate which line to jump to
+            const targetLine = Math.floor(percentage * dialogueLines.length);
+            
+            speechSynthesis.cancel();
+            currentLineIndex = targetLine;
+            elapsedTime = percentage * totalDuration;
+            
+            document.getElementById('progressBar').style.width = (percentage * 100) + '%';
+            document.getElementById('currentTime').textContent = formatTime(elapsedTime);
+            
+            if (isPlaying) {
+                speakLine(currentLineIndex);
+            }
+        }
+
+        function setSpeed(speed) {
+            speechRate = speed;
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === speed + 'x') {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // If currently playing, restart current line with new speed
+            if (isPlaying) {
+                speechSynthesis.cancel();
+                speakLine(currentLineIndex);
+            }
+        }
 
         // Initialize
-        initPageIndicator();
-        createCards();
-        updateUI();
+        initTranscription();
+        initFlashcards();
+        calculateDuration();
     </script>
 </body>
 </html>
