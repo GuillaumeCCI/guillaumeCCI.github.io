@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Activité interactive — Choisir les bons canaux de recrutement (Boulangeries Ange)</title>
+  <style>
+    :root{
+      --lime:#c8d223;
+      --green:#195850;
+      --blue:#273c86;
+      --text:#1c1c1c;
+      --muted:#5b5b5b;
+      --border:#e7e7e7;
+      --bg:#ffffff;
+      --ok:#1f7a3b;
+      --warn:#b7791f;
+      --bad:#b42318;
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+      --radius: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height:1.45;
+    }
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background:#fff;
+      border-bottom:1px solid var(--border);
+    }
+    .topbar-inner{
+      max-width:1100px; margin:0 auto;
+      padding:14px 18px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; min-width:260px;
+    }
+    .badge{
+      width:36px; height:36px; border-radius:10px;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      box-shadow: var(--shadow);
+      display:grid; place-items:center;
+      color:white; font-weight:800;
+      letter-spacing:.5px;
+    }
+    .brand-title{
+      display:flex; flex-direction:column;
+    }
+    .brand-title b{font-size:14px}
+    .brand-title span{font-size:12px; color:var(--muted)}
+    .progress{
+      flex:1;
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .progress-row{
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:12px; color:var(--muted);
+    }
+    .bar{
+      height:10px; border-radius:999px;
+      background:#f2f2f2; overflow:hidden;
+      border:1px solid var(--border);
+    }
+    .bar > div{
+      height:100%; width:0%;
+      background: linear-gradient(90deg, var(--lime), var(--green), var(--blue));
+      border-radius:999px;
+      transition: width .35s ease;
+    }
+    .score-pill{
+      display:flex; align-items:center; gap:8px;
+      padding:8px 12px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      background:#fff;
+      white-space:nowrap;
+    }
+    .score-pill b{
+      color:var(--blue);
+      font-variant-numeric: tabular-nums;
+    }
+
+    main{max-width:1100px; margin:0 auto; padding:22px 18px 48px;}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+    }
+    @media (max-width: 960px){
+      .grid{grid-template-columns: 1fr}
+      .brand{min-width:auto}
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background:#fff;
+      box-shadow: 0 6px 18px rgba(0,0,0,.04);
+      overflow:hidden;
+    }
+    .card-h{
+      padding:16px 16px 10px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:14px;
+    }
+    .kicker{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:12px; color:var(--green);
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: var(--lime);
+      box-shadow: 0 0 0 3px rgba(200,210,35,.18);
+      margin-top:2px;
+    }
+    .card-h h1,.card-h h2{margin:6px 0 0; font-size:18px}
+    .card-h p{margin:8px 0 0; color:var(--muted); font-size:13px}
+    .card-b{padding:16px}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--border);
+      font-size:12px; color:var(--muted);
+      background:#fff;
+    }
+    .pill strong{color:var(--text)}
+    .meta{
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin-top:10px;
+    }
+
+    .theory{
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .callout{
+      border-left:6px solid var(--blue);
+      background: rgba(39,60,134,.06);
+      padding:12px 12px 12px 12px;
+      border-radius: 12px;
+    }
+    .callout b{color:var(--blue)}
+    .callout p{margin:6px 0 0; color:var(--muted); font-size:13px}
+    .mini-grid{
+      display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    }
+    @media (max-width: 560px){ .mini-grid{grid-template-columns:1fr} }
+    .rule{
+      border:1px solid var(--border);
+      border-radius: 12px;
+      padding:12px;
+      background:#fff;
+    }
+    .rule h3{
+      margin:0 0 6px;
+      font-size:13px;
+      color: var(--green);
+      display:flex; align-items:center; gap:8px;
+    }
+    .rule h3 .tag{
+      font-family: var(--mono);
+      font-size:11px;
+      padding:2px 6px;
+      border-radius:8px;
+      border:1px solid rgba(25,88,80,.25);
+      color: var(--green);
+      background: rgba(25,88,80,.06);
+    }
+    .rule p{margin:0; color:var(--muted); font-size:13px}
+    .rule ul{margin:8px 0 0 18px; color:var(--muted); font-size:13px}
+    .rule li{margin:4px 0}
+
+    .channels{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 560px){ .channels{grid-template-columns:1fr} }
+    .ch{
+      border:1px solid var(--border);
+      border-radius: 12px;
+      padding:12px;
+      background:#fff;
+      cursor:pointer;
+      transition: transform .08s ease, border-color .12s ease, box-shadow .12s ease;
+      position:relative;
+      min-height:92px;
+    }
+    .ch:hover{
+      transform: translateY(-1px);
+      border-color: rgba(39,60,134,.30);
+      box-shadow: 0 8px 20px rgba(39,60,134,.08);
+    }
+    .ch.selected{
+      border-color: rgba(25,88,80,.55);
+      box-shadow: 0 10px 24px rgba(25,88,80,.10);
+      outline: 3px solid rgba(200,210,35,.18);
+    }
+    .ch-top{
+      display:flex; align-items:flex-start; gap:10px;
+    }
+    .ico{
+      width:34px; height:34px; border-radius:10px;
+      display:grid; place-items:center;
+      background: rgba(39,60,134,.07);
+      border:1px solid rgba(39,60,134,.12);
+      flex: 0 0 auto;
+      font-size:18px;
+    }
+    .ch h4{margin:0; font-size:14px}
+    .ch p{margin:4px 0 0; color:var(--muted); font-size:12.5px}
+
+    .status{
+      position:absolute; top:10px; right:10px;
+      font-size:11px; font-weight:800;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid transparent;
+      display:none;
+    }
+    .status.ok{display:inline-flex; background:rgba(31,122,59,.08); color:var(--ok); border-color:rgba(31,122,59,.20)}
+    .status.bad{display:inline-flex; background:rgba(180,35,24,.07); color:var(--bad); border-color:rgba(180,35,24,.18)}
+    .status.miss{display:inline-flex; background:rgba(183,121,31,.10); color:var(--warn); border-color:rgba(183,121,31,.20)}
+
+    .actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:14px;
+    }
+    button{
+      border:1px solid var(--border);
+      background:#fff;
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .08s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    button:hover{
+      transform: translateY(-1px);
+      border-color: rgba(39,60,134,.25);
+      box-shadow: 0 10px 24px rgba(0,0,0,.06);
+    }
+    button.primary{
+      background: linear-gradient(90deg, rgba(200,210,35,.22), rgba(25,88,80,.14));
+      border-color: rgba(25,88,80,.25);
+    }
+    button.primary span{
+      color: var(--green);
+    }
+    button.secondary{
+      background: rgba(39,60,134,.06);
+      border-color: rgba(39,60,134,.20);
+      color: var(--blue);
+    }
+    button:disabled{
+      opacity:.55; cursor:not-allowed; transform:none; box-shadow:none;
+    }
+
+    .feedback{
+      display:none;
+      margin-top:14px;
+      border:1px solid var(--border);
+      border-radius: 12px;
+      padding:12px;
+      background: rgba(25,88,80,.04);
+    }
+    .feedback.show{display:block}
+    .fb-title{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .fb-title h3{margin:0; font-size:14px; color: var(--green)}
+    .points{
+      font-family: var(--mono);
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(39,60,134,.18);
+      color: var(--blue);
+      background: rgba(39,60,134,.06);
+      white-space:nowrap;
+    }
+    .feedback p{margin:8px 0 0; color:var(--muted); font-size:13px}
+    .fb-list{
+      margin:10px 0 0;
+      padding:0;
+      list-style:none;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .fb-item{
+      border:1px solid var(--border);
+      border-radius: 12px;
+      padding:10px;
+      background:#fff;
+    }
+    .fb-item b{font-size:12px}
+    .fb-item .why{margin:6px 0 0; font-size:12.5px; color:var(--muted)}
+    .fb-item .lab{
+      font-size:11px; font-weight:900;
+      padding:3px 8px; border-radius:999px;
+      border:1px solid transparent;
+      display:inline-flex; align-items:center; gap:6px;
+      margin-left:8px;
+    }
+    .lab.ok{background:rgba(31,122,59,.08); color:var(--ok); border-color:rgba(31,122,59,.18)}
+    .lab.bad{background:rgba(180,35,24,.07); color:var(--bad); border-color:rgba(180,35,24,.18)}
+    .lab.miss{background:rgba(183,121,31,.10); color:var(--warn); border-color:rgba(183,121,31,.20)}
+
+    .screen{display:none}
+    .screen.show{display:block}
+
+    .result-hero{
+      padding:16px;
+      background: linear-gradient(135deg, rgba(39,60,134,.08), rgba(200,210,35,.10));
+      border:1px solid rgba(39,60,134,.14);
+      border-radius: 16px;
+    }
+    .result-hero h2{margin:0 0 6px}
+    .result-hero p{margin:0; color:var(--muted)}
+    .result-grid{
+      display:grid; grid-template-columns: 1fr 1fr; gap:12px;
+      margin-top:12px;
+    }
+    @media (max-width: 720px){ .result-grid{grid-template-columns:1fr} }
+    .result-box{
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding:12px;
+      background:#fff;
+    }
+    .result-box h3{margin:0 0 6px; font-size:13px; color:var(--blue)}
+    .result-box p{margin:0; color:var(--muted); font-size:13px}
+    .small{font-size:12px; color:var(--muted)}
+    .hr{height:1px; background:var(--border); margin:12px 0}
+    .hint{
+      font-size:12px; color:var(--muted);
+      margin-top:8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="badge">RH</div>
+        <div class="brand-title">
+          <b>Choisir ses canaux de recrutement</b>
+          <span>Boulangeries Ange · activité interactive</span>
+        </div>
+      </div>
+
+      <div class="progress">
+        <div class="progress-row">
+          <span id="stepLabel">Introduction</span>
+          <span><span id="stepCount">0</span>/4 scénarios</span>
+        </div>
+        <div class="bar" aria-hidden="true"><div id="barFill"></div></div>
+      </div>
+
+      <div class="score-pill" title="Score cumulé">
+        Score <b><span id="scoreTotal">0</span>/100</b>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- INTRO -->
+    <section id="screenIntro" class="screen show">
+      <div class="grid">
+        <div class="card">
+          <div class="card-h">
+            <div>
+              <div class="kicker"><span class="dot"></span>Objectif de compétence</div>
+              <h1>Sélectionner les canaux de recrutement appropriés</h1>
+              <p>
+                Vous allez traiter 4 situations réalistes en boulangerie (Boulangeries Ange).
+                À chaque fois, vous devrez <b>raisonner</b> en combinant <b>poste</b>, <b>urgence</b> et <b>bassin d’emploi</b>,
+                puis choisir une <b>stratégie multicanale</b>.
+              </p>
+              <div class="meta">
+                <span class="pill"><strong>Format</strong> · 4 scénarios · feedback immédiat</span>
+                <span class="pill"><strong>Score</strong> · 25 pts/scénario · total 100</span>
+                <span class="pill"><strong>Règle</strong> · plusieurs canaux possibles</span>
+              </div>
+            </div>
+            <div class="pill" style="border-color: rgba(200,210,35,.55); color: var(--green);">
+              <strong style="color:var(--green)">⚡</strong>Learning by doing
+            </div>
+          </div>
+          <div class="card-b theory">
+            <div class="callout">
+              <b>Idée clé</b>
+              <p>
+                Un recrutement efficace n’est pas “un canal = une solution”.
+                C’est une <b>décision contextualisée</b> : on combine des leviers rapides et structurels,
+                plus ou moins ciblés, selon la réalité locale et le profil recherché.
+              </p>
+            </div>
+
+            <div class="mini-grid">
+              <div class="rule">
+                <h3>1) Nature du poste <span class="tag">Ciblage</span></h3>
+                <p>Plus le poste est qualifié/spécifique, plus il faut des canaux “précis”.</p>
+                <ul>
+                  <li>Poste rare → réseaux pro, spécialisées, cooptation, sourcing.</li>
+                  <li>Poste courant → canaux grand public + proximité locale.</li>
+                </ul>
+              </div>
+              <div class="rule">
+                <h3>2) Urgence <span class="tag">Vitesse</span></h3>
+                <p>Plus c’est urgent, plus on privilégie des canaux activables vite.</p>
+                <ul>
+                  <li>Immédiat → intérim, réseaux locaux, viviers, social.</li>
+                  <li>Anticipé → écoles/CFA, marque employeur, partenaires.</li>
+                </ul>
+              </div>
+              <div class="rule">
+                <h3>3) Bassin d’emploi <span class="tag">Territoire</span></h3>
+                <p>Le territoire conditionne la disponibilité et la concurrence.</p>
+                <ul>
+                  <li>Zone tendue → différenciation + canaux multiples.</li>
+                  <li>Zone rurale → proximité, affichage, réseaux locaux.</li>
+                </ul>
+              </div>
+              <div class="rule">
+                <h3>4) Logique multicanale <span class="tag">Robustesse</span></h3>
+                <p>On sécurise en combinant : visibilité + ciblage + rapidité.</p>
+                <ul>
+                  <li>1 canal = fragile ; 3–5 canaux = robuste.</li>
+                  <li>On évite les réflexes : “LinkedIn pour tout” ou “France Travail suffit”.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="primary" id="btnStart"><span>▶</span> Démarrer l’activité</button>
+              <button class="secondary" id="btnShowRules">Voir les règles de score</button>
+            </div>
+
+            <div id="rulesBox" class="feedback" style="display:none;">
+              <div class="fb-title">
+                <h3>Règles de score (simplifiées)</h3>
+                <div class="points">25 pts / scénario</div>
+              </div>
+              <p>
+                Vous gagnez des points en sélectionnant des canaux pertinents.
+                Vous perdez quelques points si vous cochez des canaux clairement inadaptés.
+                Le score ne descend jamais sous 0.
+              </p>
+              <p class="small">
+                Note : l’objectif n’est pas d’“éviter les erreurs” à tout prix, mais de construire une stratégie.
+                Le feedback vous explique les arbitrages attendus.
+              </p>
+            </div>
+
+            <div class="hint">Conseil : avant de cliquer, identifiez d’abord “quel est le risque principal ?” (pénurie, vitesse, volume, expertise…)</div>
+          </div>
+        </div>
+
+        <aside class="card">
+          <div class="card-h">
+            <div>
+              <div class="kicker"><span class="dot"></span>Canaux mobilisables</div>
+              <h2>Répertoire (pour l’activité)</h2>
+              <p>Vous les retrouverez dans chaque scénario. L’important : savoir <b>quand</b> les activer.</p>
+            </div>
+          </div>
+          <div class="card-b" id="channelLegend"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- SCENARIO -->
+    <section id="screenScenario" class="screen">
+      <div class="grid">
+        <div class="card">
+          <div class="card-h">
+            <div>
+              <div class="kicker"><span class="dot"></span><span id="scTitleKicker">Scénario</span></div>
+              <h2 id="scTitle">—</h2>
+              <p id="scBrief">—</p>
+              <div class="meta" id="scMeta"></div>
+            </div>
+            <div class="pill" style="border-color: rgba(39,60,134,.22); color: var(--blue);">
+              <strong style="color:var(--blue)">🧩</strong>Choix multicanal
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="callout" style="border-left-color: var(--green); background: rgba(25,88,80,.05);">
+              <b>Question</b>
+              <p style="margin-top:6px;">
+                Quels canaux de recrutement privilégieriez-vous dans cette situation ?
+                <b>Plusieurs réponses sont possibles</b>. Une seule réponse suffit rarement.
+              </p>
+            </div>
+
+            <div style="margin-top:12px;">
+              <div class="channels" id="channelGrid"></div>
+            </div>
+
+            <div class="actions">
+              <button class="primary" id="btnValidate" disabled><span>✔</span> Valider mes choix</button>
+              <button id="btnReset">Réinitialiser</button>
+              <button class="secondary" id="btnNext" disabled>Scénario suivant</button>
+            </div>
+
+            <div id="feedbackBox" class="feedback">
+              <div class="fb-title">
+                <h3 id="fbHeadline">—</h3>
+                <div class="points" id="fbPoints">—</div>
+              </div>
+              <p id="fbText">—</p>
+              <div class="hr"></div>
+              <ul class="fb-list" id="fbList"></ul>
+              <p class="hint" id="fbHint"></p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="card">
+          <div class="card-h">
+            <div>
+              <div class="kicker"><span class="dot"></span>Aide à la décision</div>
+              <h2>Mini-grille</h2>
+              <p>Servez-vous de ces questions avant de valider.</p>
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="rule">
+              <h3>Étape 1 · Poste</h3>
+              <p class="small">Qu’est-ce qui rend ce poste facile/difficile à sourcer en boulangerie ?</p>
+              <ul>
+                <li>Niveau d’expérience / autonomie</li>
+                <li>Compétences rares (ex. tourage, management)</li>
+                <li>Attractivité locale / horaires</li>
+              </ul>
+            </div>
+            <div style="height:10px"></div>
+            <div class="rule">
+              <h3>Étape 2 · Urgence</h3>
+              <p class="small">Quel canal active un vivier immédiatement et lequel construit sur 2–6 semaines ?</p>
+              <ul>
+                <li>Immédiat : intérim, réseaux locaux, social grand public</li>
+                <li>Structurant : écoles/CFA, cooptation, cabinet, spécialisé</li>
+              </ul>
+            </div>
+            <div style="height:10px"></div>
+            <div class="rule">
+              <h3>Étape 3 · Bassin d’emploi</h3>
+              <p class="small">Le territoire impose-t-il un “plan A + plan B” ?</p>
+              <ul>
+                <li>Zone tendue : multiplier + différencier</li>
+                <li>Rural : proximité + partenariats locaux</li>
+                <li>Saisonnier : volume + visibilité</li>
+              </ul>
+            </div>
+            <div style="height:10px"></div>
+            <div class="callout" style="border-left-color: var(--lime); background: rgba(200,210,35,.10);">
+              <b>Astuce</b>
+              <p>Si vous cochez “trop large” (ex. cabinet pour un besoin immédiat non qualifié), vous risquez une pénalité : ce n’est pas interdit, mais c’est moins cohérent.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="screenResults" class="screen">
+      <div class="card">
+        <div class="card-h">
+          <div>
+            <div class="kicker"><span class="dot"></span>Résultats</div>
+            <h2>Votre synthèse</h2>
+            <p>Vous avez terminé les 4 scénarios. Voici votre positionnement et les points clés à retenir.</p>
+          </div>
+        </div>
+        <div class="card-b">
+          <div class="result-hero">
+            <h2>Score global : <span id="finalScore" style="color:var(--blue)"></span>/100</h2>
+            <p id="finalMsg">—</p>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-box">
+              <h3>📌 Ce que vous avez entraîné</h3>
+              <p>
+                Une logique de décision : <b>poste</b> (ciblage), <b>urgence</b> (vitesse), <b>bassin</b> (territoire),
+                et la construction d’une <b>stratégie multicanale</b> plutôt que d’un réflexe.
+              </p>
+            </div>
+            <div class="result-box">
+              <h3>🧠 Principes à retenir</h3>
+              <p>
+                1) Plus c’est spécifique, plus il faut du ciblé. 2) Plus c’est urgent, plus il faut du rapide.
+                3) Plus le bassin est tendu, plus il faut multiplier et différencier.
+                4) La robustesse vient du multicanal.
+              </p>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="result-box">
+            <h3>✅ Checklist opérationnelle (boulangerie)</h3>
+            <p class="small">
+              Avant de lancer une annonce, posez-vous : (a) Qui est mon candidat “réaliste” sur ce territoire ?
+              (b) Dans combien de jours dois-je l’avoir ? (c) Quels 3 canaux complémentaires couvrent : visibilité + ciblage + rapidité ?
+            </p>
+          </div>
+
+          <div class="actions" style="margin-top:14px;">
+            <button class="primary" id="btnRestart"><span>↻</span> Refaire l’activité</button>
+            <button id="btnBackIntro">Retour à l’introduction</button>
+          </div>
+
+          <p class="hint">
+            Variante d’animation (si vous utilisez ceci en classe) : faites justifier à l’oral en 30 secondes, puis comparez deux stratégies “équivalentes” mais différentes, en discutant le bassin d’emploi.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ----------------------------
+    // Données canaux (réutilisées)
+    // ----------------------------
+    const CHANNELS = [
+      { id:"france_travail", name:"France Travail / jobboards généralistes", icon:"🗂️", desc:"Large diffusion et vivier local, utile pour postes courants." },
+      { id:"linkedin", name:"Réseaux sociaux professionnels (LinkedIn)", icon:"💼", desc:"Ciblage et approche directe pour profils qualifiés / encadrement." },
+      { id:"social_local", name:"Réseaux sociaux grand public / groupes locaux", icon:"📣", desc:"Rapide, utile pour proximité, saisonnier, besoins immédiats." },
+      { id:"interim", name:"Intérim", icon:"⏱️", desc:"Activation très rapide, utile si urgence + continuité d’activité." },
+      { id:"cooptation", name:"Cooptation (réseau interne)", icon:"🤝", desc:"Qualité et fit culturel, efficace en zone tendue si équipe mobilisée." },
+      { id:"affichage", name:"Affichage local (magasin, commerces, mairie)", icon:"📌", desc:"Proximité et visibilité terrain, pertinent en semi-rural / local." },
+      { id:"ecoles_cfa", name:"Écoles / CFA (apprentissage)", icon:"🎓", desc:"Canal structurant pour anticiper et sécuriser des viviers." },
+      { id:"specialise", name:"Sites spécialisés métiers (boulangerie/restauration)", icon:"🥖", desc:"Ciblage métier, utile quand le profil est plus rare." },
+      { id:"cabinet", name:"Cabinet de recrutement", icon:"🧭", desc:"Pour postes à responsabilité / rareté, délais plus longs et coût." }
+    ];
+
+    // ------------------------------------------------
+    // 4 scénarios contextualisés Boulangeries Ange
+    // ------------------------------------------------
+    const SCENARIOS = [
+      {
+        title: "Boulanger (H/F) — ouverture de fournil en zone urbaine tendue",
+        brief: "Vous recrutez un boulanger autonome. Plusieurs concurrents recrutent en même temps dans la zone. Vous voulez sécuriser en 3–4 semaines.",
+        meta: {
+          poste: "Boulanger · autonome · expérience 2+ ans",
+          urgence: "Court terme (3–4 semaines)",
+          bassin: "Urbain dense · marché concurrentiel"
+        },
+        // canaux considérés pertinents dans cette situation
+        correct: ["specialise","cooptation","france_travail","social_local"],
+        // canaux considérés franchement moins adaptés ici (pas interdits, mais “hors-sujet”)
+        incorrect: ["cabinet"],
+        rationale: {
+          specialise: "Le poste demande un vrai ciblage métier : les plateformes spécialisées touchent des candidats déjà qualifiés.",
+          cooptation: "En zone tendue, le réseau interne peut accélérer l’accès à des profils fiables et motivés.",
+          france_travail: "Large diffusion locale : utile pour capter des profils disponibles, en complément d’un canal métier.",
+          social_local: "Accélère la visibilité (groupes de quartier, pages locales) et peut déclencher des candidatures rapides.",
+          cabinet: "Pour un poste opérationnel avec délai de 3–4 semaines, le cabinet est souvent disproportionné (coût/délai)."
+        },
+        hint: "En zone tendue, la robustesse vient du couple : ciblage métier + amplification locale + activation du réseau."
+      },
+      {
+        title: "Vendeur(se) en boulangerie — remplacement demain (urgence immédiate)",
+        brief: "Absence imprévue. Vous devez ouvrir et tenir le service dès demain. Le bassin est semi-rural, avec peu de candidats disponibles.",
+        meta: {
+          poste: "Vente comptoir · prise de poste rapide · formation courte",
+          urgence: "Immédiat (dès demain)",
+          bassin: "Semi-rural · vivier restreint"
+        },
+        correct: ["interim","social_local","affichage","france_travail"],
+        incorrect: ["cabinet","linkedin","specialise"],
+        rationale: {
+          interim: "C’est le canal le plus rapide pour sécuriser la continuité d’activité dès demain.",
+          social_local: "Les groupes locaux (Facebook, pages de commune) sont très efficaces en semi-rural pour activer la proximité.",
+          affichage: "Dans les zones semi-rurales, la visibilité terrain (magasin/partenaires) capte des candidats proches et disponibles.",
+          france_travail: "Permet d’activer un vivier local et d’appeler directement des profils disponibles.",
+          cabinet: "Trop lent et coûteux pour un remplacement immédiat sur un poste courant.",
+          linkedin: "Peu pertinent ici : le canal est plus adapté à des profils qualifiés/encadrement.",
+          specialise: "Ciblage métier inutile pour un poste vente urgent : priorité aux canaux rapides et de proximité."
+        },
+        hint: "Quand l’urgence est maximale, le critère dominant est la vitesse (puis la proximité)."
+      },
+      {
+        title: "Équipe saisonnière (6 personnes) — période estivale (volume + visibilité)",
+        brief: "Vous anticipez un pic d’activité touristique. Vous recrutez en volume pour 2 mois. Le territoire est très saisonnier, rotation élevée.",
+        meta: {
+          poste: "Saisonnier · volume · contrats courts",
+          urgence: "Anticipé (4–8 semaines avant)",
+          bassin: "Touristique / saisonnier"
+        },
+        correct: ["social_local","france_travail","affichage","ecoles_cfa"],
+        incorrect: ["cabinet","linkedin","specialise"],
+        rationale: {
+          social_local: "Très bon levier de visibilité rapide et massive (communautés locales + touristiques) pour recruter en volume.",
+          france_travail: "Diffusion large et viviers mobilisables pour contrats courts, utile pour obtenir beaucoup de candidatures.",
+          affichage: "Fort impact en zone touristique (passage, commerces, partenariats), utile pour attirer localement.",
+          ecoles_cfa: "Même si c’est saisonnier, les écoles/CFA peuvent fournir des profils disponibles (jobs d’été) et renforcer la visibilité.",
+          cabinet: "Peu adapté : coût et démarche incompatible avec un besoin de volume et de rapidité de candidatures.",
+          linkedin: "Canal moins performant pour recrutement saisonnier en volume.",
+          specialise: "Ciblage métier pas prioritaire : le besoin principal est la visibilité et le volume."
+        },
+        hint: "Pour du volume saisonnier : priorité à la visibilité + facilité de candidature + proximité."
+      },
+      {
+        title: "Responsable de magasin — création de poste (management + exigence)",
+        brief: "Vous ouvrez une nouvelle boulangerie. Vous cherchez un responsable (pilotage, management, qualité). Vous avez 6–8 semaines.",
+        meta: {
+          poste: "Management · responsabilité · expérience confirmée",
+          urgence: "Court terme (6–8 semaines)",
+          bassin: "Urbain / concurrentiel"
+        },
+        correct: ["linkedin","cooptation","cabinet","specialise"],
+        incorrect: ["affichage"],
+        rationale: {
+          linkedin: "C’est un canal clé pour toucher des managers, faire du ciblage et du sourcing proactif.",
+          cooptation: "Pour un poste sensible, le réseau aide à sécuriser le fit culturel et à accélérer le sourcing.",
+          cabinet: "Utile si le bassin est concurrentiel et que vous voulez sécuriser une shortlist qualifiée rapidement.",
+          specialise: "Peut toucher des profils déjà dans la restauration/commerce alimentaire avec expérience pertinente.",
+          affichage: "Trop local et peu discriminant pour un poste de management : risque de candidatures hors-cible."
+        },
+        hint: "Plus le poste est stratégique, plus l’enjeu est la qualité du ciblage et la sécurisation du fit."
+      }
+    ];
+
+    // ----------------------------
+    // État
+    // ----------------------------
+    let current = -1;
+    let totalScore = 0;
+    let perScenarioScore = [0,0,0,0];
+    let validated = false;
+    let selected = new Set();
+
+    // ----------------------------
+    // Helpers UI
+    // ----------------------------
+    const $ = (id) => document.getElementById(id);
+    const show = (screenId) => {
+      ["screenIntro","screenScenario","screenResults"].forEach(s => $(s).classList.remove("show"));
+      $(screenId).classList.add("show");
+    };
+
+    const updateTopbar = () => {
+      const stepCount = Math.max(0, current);
+      $("stepCount").textContent = Math.max(0, current+1);
+      $("scoreTotal").textContent = totalScore;
+
+      if(current < 0){
+        $("stepLabel").textContent = "Introduction";
+        $("barFill").style.width = "0%";
+      } else if(current >= 0 && current < SCENARIOS.length){
+        $("stepLabel").textContent = `Scénario ${current+1}`;
+        $("barFill").style.width = `${Math.round(((current+1)/SCENARIOS.length)*100)}%`;
+      } else {
+        $("stepLabel").textContent = "Résultats";
+        $("barFill").style.width = "100%";
+      }
+    };
+
+    // ----------------------------
+    // Rendu légende canaux
+    // ----------------------------
+    const renderLegend = () => {
+      const wrap = document.createElement("div");
+      wrap.className = "channels";
+      CHANNELS.forEach(ch => {
+        const card = document.createElement("div");
+        card.className = "ch";
+        card.style.cursor = "default";
+        card.innerHTML = `
+          <div class="ch-top">
+            <div class="ico">${ch.icon}</div>
+            <div>
+              <h4>${ch.name}</h4>
+              <p>${ch.desc}</p>
+            </div>
+          </div>
+        `;
+        wrap.appendChild(card);
+      });
+      $("channelLegend").appendChild(wrap);
+    };
+
+    // ----------------------------
+    // Rendu scénario
+    // ----------------------------
+    const renderScenario = () => {
+      validated = false;
+      selected = new Set();
+
+      const sc = SCENARIOS[current];
+      $("scTitleKicker").textContent = `Scénario ${current+1}/4`;
+      $("scTitle").textContent = sc.title;
+      $("scBrief").textContent = sc.brief;
+
+      // Meta pills
+      const meta = $("scMeta");
+      meta.innerHTML = "";
+      const mk = (label, value, color) => {
+        const s = document.createElement("span");
+        s.className = "pill";
+        s.innerHTML = `<strong>${label}</strong> · ${value}`;
+        if(color){
+          s.style.borderColor = color;
+        }
+        return s;
+      };
+      meta.appendChild(mk("Poste", sc.meta.poste, "rgba(39,60,134,.20)"));
+      meta.appendChild(mk("Urgence", sc.meta.urgence, "rgba(200,210,35,.55)"));
+      meta.appendChild(mk("Bassin", sc.meta.bassin, "rgba(25,88,80,.25)"));
+
+      // Grid canaux
+      const grid = $("channelGrid");
+      grid.innerHTML = "";
+      CHANNELS.forEach(ch => {
+        const item = document.createElement("div");
+        item.className = "ch";
+        item.dataset.id = ch.id;
+
+        item.innerHTML = `
+          <span class="status" id="st_${ch.id}"></span>
+          <div class="ch-top">
+            <div class="ico">${ch.icon}</div>
+            <div>
+              <h4>${ch.name}</h4>
+              <p>${ch.desc}</p>
+            </div>
+          </div>
+        `;
+
+        item.addEventListener("click", () => {
+          if(validated) return;
+          const id = ch.id;
+          if(selected.has(id)){
+            selected.delete(id);
+            item.classList.remove("selected");
+          } else {
+            selected.add(id);
+            item.classList.add("selected");
+          }
+          $("btnValidate").disabled = selected.size === 0;
+        });
+
+        grid.appendChild(item);
+      });
+
+      $("btnValidate").disabled = true;
+      $("btnNext").disabled = true;
+      $("feedbackBox").classList.remove("show");
+      updateTopbar();
+    };
+
+    // ----------------------------
+    // Scoring + feedback
+    // ----------------------------
+    const scoreScenario = () => {
+      const sc = SCENARIOS[current];
+      const correct = new Set(sc.correct);
+      const incorrect = new Set(sc.incorrect);
+
+      let good = 0;
+      let bad = 0;
+
+      selected.forEach(id => {
+        if(correct.has(id)) good++;
+        else if(incorrect.has(id)) bad++;
+        // neutre = ni correct ni incorrect : pas de points, pas de pénalité
+      });
+
+      const missed = [...correct].filter(id => !selected.has(id));
+
+      // Score (25 pts)
+      // - points pour bons choix (jusqu’à 25)
+      // - pénalité modérée pour erreurs manifestes
+      // - plancher 0
+      const perGood = correct.size > 0 ? 25 / correct.size : 0;
+      let score = Math.round(good * perGood);
+      score -= bad * 4; // pénalité modérée
+      score = Math.max(0, Math.min(25, score));
+
+      // Message de synthèse
+      let headline = "À améliorer";
+      if(score >= 21) headline = "Excellent";
+      else if(score >= 14) headline = "Partiellement correct";
+
+      // Feedback text : ancré sur poste/urgence/bassin
+      const fbText =
+        `Votre stratégie est évaluée sur votre capacité à articuler ` +
+        `le <b>ciblage</b> (nature du poste), la <b>vitesse</b> (urgence) et ` +
+        `la <b>réalité territoriale</b> (bassin d’emploi). ` +
+        `Ici, le critère dominant est : <b>${dominantCriterion(sc.meta)}</b>.`;
+
+      return { score, headline, missed, good, bad, fbText };
+    };
+
+    const dominantCriterion = (meta) => {
+      // heuristique simple et lisible
+      if(meta.urgence.toLowerCase().includes("immédiat")) return "la vitesse (urgence immédiate)";
+      if(meta.poste.toLowerCase().includes("management") || meta.poste.toLowerCase().includes("responsabilité")) return "le ciblage (poste stratégique)";
+      if(meta.bassin.toLowerCase().includes("touristique") || meta.bassin.toLowerCase().includes("saisonnier")) return "la visibilité (volume saisonnier)";
+      if(meta.bassin.toLowerCase().includes("tendue") || meta.bassin.toLowerCase().includes("concurrentiel")) return "la robustesse multicanale (marché tendu)";
+      return "l’équilibre poste / urgence / bassin";
+    };
+
+    const applyVisualFeedback = () => {
+      const sc = SCENARIOS[current];
+      const correct = new Set(sc.correct);
+      const incorrect = new Set(sc.incorrect);
+
+      // reset status pills
+      CHANNELS.forEach(ch => {
+        const st = $("st_" + ch.id);
+        st.className = "status";
+        st.textContent = "";
+      });
+
+      // Mark selected
+      selected.forEach(id => {
+        const st = $("st_" + id);
+        if(correct.has(id)){
+          st.classList.add("status","ok");
+          st.textContent = "Correct";
+        } else if(incorrect.has(id)){
+          st.classList.add("status","bad");
+          st.textContent = "Incorrect";
+        } else {
+          // neutre : on peut laisser vide pour éviter une sur-signalisation
+        }
+      });
+
+      // Mark missed correct
+      sc.correct.forEach(id => {
+        if(!selected.has(id)){
+          const st = $("st_" + id);
+          st.classList.add("status","miss");
+          st.textContent = "Manqué";
+        }
+      });
+    };
+
+    const renderFeedbackDetails = () => {
+      const sc = SCENARIOS[current];
+      const correct = new Set(sc.correct);
+      const incorrect = new Set(sc.incorrect);
+
+      const list = $("fbList");
+      list.innerHTML = "";
+
+      // On liste : (1) bons choix, (2) erreurs manifestes, (3) canaux manqués
+      const addItem = (id, labelClass, labelText) => {
+        const ch = CHANNELS.find(x => x.id === id);
+        const why = sc.rationale[id] || "—";
+        const li = document.createElement("li");
+        li.className = "fb-item";
+        li.innerHTML = `
+          <div>
+            <b>${ch ? ch.name : id}</b>
+            <span class="lab ${labelClass}">${labelText}</span>
+          </div>
+          <div class="why">${why}</div>
+        `;
+        list.appendChild(li);
+      };
+
+      // Correct selected
+      [...selected].filter(id => correct.has(id)).forEach(id => addItem(id, "ok", "Pertinent"));
+      // Incorrect selected
+      [...selected].filter(id => incorrect.has(id)).forEach(id => addItem(id, "bad", "Peu adapté"));
+      // Missed correct
+      sc.correct.filter(id => !selected.has(id)).forEach(id => addItem(id, "miss", "À envisager"));
+
+      $("fbHint").innerHTML = `<b>Repère :</b> ${sc.hint}`;
+    };
+
+    // ----------------------------
+    // Navigation
+    // ----------------------------
+    const start = () => {
+      current = 0;
+      totalScore = 0;
+      perScenarioScore = [0,0,0,0];
+      show("screenScenario");
+      renderScenario();
+    };
+
+    const validate = () => {
+      if(validated) return;
+
+      validated = true;
+      const { score, headline, fbText } = scoreScenario();
+
+      // mise à jour score global (on remplace au cas où)
+      totalScore -= perScenarioScore[current];
+      perScenarioScore[current] = score;
+      totalScore += score;
+
+      $("fbHeadline").textContent = headline;
+      $("fbPoints").textContent = `+${score} pts (sur 25)`;
+      $("fbText").innerHTML = fbText;
+
+      applyVisualFeedback();
+      renderFeedbackDetails();
+
+      $("feedbackBox").classList.add("show");
+      $("btnNext").disabled = false;
+      $("btnValidate").disabled = true;
+
+      updateTopbar();
+    };
+
+    const next = () => {
+      if(current < SCENARIOS.length - 1){
+        current++;
+        renderScenario();
+      } else {
+        // results
+        show("screenResults");
+        $("finalScore").textContent = totalScore;
+
+        let msg = "Vous avez une base solide : continuez à expliciter vos arbitrages pour stabiliser vos stratégies.";
+        if(totalScore >= 85){
+          msg = "Maîtrise élevée : vos choix montrent une logique multicanale cohérente et contextualisée.";
+        } else if(totalScore >= 60){
+          msg = "Maîtrise intermédiaire : vos stratégies sont souvent pertinentes, mais certaines situations demandent un meilleur arbitrage urgence/territoire.";
+        } else {
+          msg = "À consolider : vous avez parfois appliqué des réflexes de canal. Reprenez la mini-grille poste/urgence/bassin pour guider vos choix.";
+        }
+        $("finalMsg").textContent = msg;
+
+        current = SCENARIOS.length; // pour la topbar
+        updateTopbar();
+      }
+    };
+
+    const resetSelection = () => {
+      if(validated) return;
+      selected.clear();
+      document.querySelectorAll(".ch.selected").forEach(el => el.classList.remove("selected"));
+      $("btnValidate").disabled = true;
+    };
+
+    const restart = () => {
+      current = -1;
+      totalScore = 0;
+      perScenarioScore = [0,0,0,0];
+      show("screenIntro");
+      updateTopbar();
+    };
+
+    // ----------------------------
+    // Bindings
+    // ----------------------------
+    $("btnStart").addEventListener("click", start);
+    $("btnValidate").addEventListener("click", validate);
+    $("btnNext").addEventListener("click", next);
+    $("btnReset").addEventListener("click", resetSelection);
+
+    $("btnRestart").addEventListener("click", start);
+    $("btnBackIntro").addEventListener("click", restart);
+
+    $("btnShowRules").addEventListener("click", () => {
+      const box = $("rulesBox");
+      box.style.display = (box.style.display === "none" || !box.style.display) ? "block" : "none";
+    });
+
+    // init
+    renderLegend();
+    updateTopbar();
+  </script>
+</body>
+</html>
