@@ -1,0 +1,824 @@
+import React, { useState } from "react";
+
+// ═══════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════
+const PHASES = [
+  { id: "intro", label: "Accueil" },
+  { id: "tri", label: "Tri express" },
+  { id: "construction", label: "Construire l'annonce" },
+  { id: "bilan", label: "Bilan" },
+];
+
+const BAKERY_CONTEXT = {
+  nom: "Le Fournil des Halles",
+  desc: "Boulangerie artisanale de 10 salariés, implantée depuis 12 ans en centre-ville de Rennes. Farines bio livrées par 2 minoteries bretonnes (rayon < 40 km), levain naturel, cuisson au four à sole. Labellisée « Artisan de confiance » depuis 2022. 3 boutiques, 1 fournil central. Collecte des invendus via Too Good To Go depuis 2021.",
+  poste: "Boulanger / Boulangère en CDI",
+};
+
+// ═══════════════════════════════════════════════════
+// PHASE 1 — TRI EXPRESS
+// ═══════════════════════════════════════════════════
+const TRI_ITEMS = [
+  { id: 1, text: "Jeune boulanger dynamique recherché", bad: true, cat: "Âge", fix: "Boulanger(ère) enthousiaste et motivé(e)" },
+  { id: 2, text: "Maîtrise parfaite du français oral et écrit", bad: false },
+  { id: 3, text: "Merci de joindre une photo récente", bad: true, cat: "Apparence", fix: "Merci de joindre CV + lettre de motivation" },
+  { id: 4, text: "Poste avec manutention régulière de charges (25 kg)", bad: false },
+  { id: 5, text: "Homme de terrain, robuste et endurant", bad: true, cat: "Genre", fix: "Personne de terrain, à l'aise dans un environnement physique" },
+  { id: 6, text: "Expérience de 3 ans en boulangerie artisanale souhaitée", bad: false },
+  { id: 7, text: "Disponibilité totale, pas de contraintes familiales", bad: true, cat: "Famille", fix: "Poste en horaires décalés (4h-12h), du mardi au samedi" },
+  { id: 8, text: "Rémunération : 24 000–28 000 € brut/an selon expérience", bad: false },
+];
+
+// ═══════════════════════════════════════════════════
+// PHASE 2 — CONSTRUCTION (Textes équilibrés en longueur)
+// ═══════════════════════════════════════════════════
+const STEPS = [
+  { id: "entete", label: "En-tête", icon: "📌", num: "01" },
+  { id: "presentation", label: "Qui sommes-nous", icon: "🏠", num: "02" },
+  { id: "missions", label: "Missions", icon: "🎯", num: "03" },
+  { id: "profil", label: "Profil recherché", icon: "👤", num: "04" },
+  { id: "conditions", label: "Conditions & RSE", icon: "📋", num: "05" },
+];
+
+const ENTETE_FIELDS = [
+  {
+    id: "intitule", label: "Intitulé du poste",
+    options: [
+      { id: "a", text: "Boulanger qualifié pour rejoindre notre équipe de production matinale", correct: false, why: "Masculin seul, excluant. Ne cible pas la bonne requête." },
+      { id: "b", text: "Boulanger / Boulangère (H/F) en CDI — Rejoignez notre fournil", correct: true, why: "Intitulé inclusif, clair, conforme à la loi et orienté recherche." },
+      { id: "c", text: "Artisan pétrisseur polyvalent passionné par le travail de la pâte", correct: false, why: "Trop original : le candidat ne trouvera pas l'offre en cherchant « boulanger »." },
+    ],
+  },
+  {
+    id: "contrat", label: "Type de contrat",
+    options: [
+      { id: "a", text: "Contrat à Durée Indéterminée (CDI) – Temps plein (35h/semaine)", correct: true, why: "Clair, précis, et juridiquement conforme aux attentes d'un candidat." },
+      { id: "b", text: "CDD de 6 mois avec une forte possibilité d'évolution vers un CDI à l'issue", correct: false, why: "Promettre un CDI à l'issue d'un CDD est juridiquement risqué si non garanti." },
+      { id: "c", text: "CDI avec une période d'essai de 2 mois stricte et potentiellement éliminatoire", correct: false, why: "Le terme « éliminatoire » est menaçant et inadapté pour attirer des talents." },
+    ],
+  },
+  {
+    id: "experience", label: "Expérience demandée",
+    options: [
+      { id: "a", text: "Maximum 5 ans d'expérience souhaitée afin de s'adapter à nos méthodes", correct: false, why: "Un plafond d'expérience est une discrimination indirecte par l'âge." },
+      { id: "b", text: "2 à 4 ans d'expérience réussie en boulangerie artisanale exigée", correct: true, why: "Fourchette raisonnable, contextualisée, sans plafond excluant les plus âgés." },
+      { id: "c", text: "Profil expert senior justifiant d'un minimum de 15 années d'expérience", correct: false, why: "Durée excessive combinée au mot « senior » = discrimination par l'âge." },
+    ],
+  },
+  {
+    id: "localisation", label: "Localisation",
+    options: [
+      { id: "a", text: "Rennes centre (35) — Laboratoire de production du Fournil des Halles", correct: true, why: "Précis : ville, département, lieu de travail exact. Utile pour le trajet." },
+      { id: "b", text: "Bretagne (déplacements ponctuels possibles entre nos différents sites)", correct: false, why: "Trop vague : le candidat ne peut pas évaluer son temps de trajet quotidien." },
+    ],
+  },
+];
+
+const PRESENTATION_BLOCKS = [
+  { id: "p1", text: "Boulangerie artisanale de 10 salariés, comprenant 3 boutiques situées à Rennes et un laboratoire de production central.", good: true, order: 1, why: "Factuel : taille, implantation, structure. Le candidat comprend concrètement l'entreprise." },
+  { id: "p2", text: "Notre passion du pain est notre ADN depuis toujours, nous mettons tout notre cœur et notre amour authentique dans nos fabrications quotidiennes.", good: false, why: "Phrase creuse et jargonneuse. Ne donne aucune information concrète au candidat." },
+  { id: "p3", text: "Farines 100% bio livrées par 2 minoteries bretonnes (rayon < 40 km), utilisation exclusive de levain naturel, et cuisson au four à sole.", good: true, order: 2, why: "Engagements RSE concrets, chiffrés et vérifiables. Le candidat voit la réalité du travail." },
+  { id: "p4", text: "Entreprise fortement engagée, éco-responsable et soucieuse de l'environnement, travaillant dans une démarche globale de développement durable.", good: false, why: "Affirmation sans aucune preuve = greenwashing. La RSE se prouve par des faits." },
+  { id: "p5", text: "Labellisée « Artisan de confiance » depuis 2022 et partenaire du dispositif de collecte des invendus Too Good To Go depuis l'année 2021.", good: true, order: 3, why: "Preuves concrètes : label + dispositif anti-gaspi daté. C'est crédible et vérifiable." },
+  { id: "p6", text: "Nous sommes une grande famille bienveillante, dynamique et chaleureuse qui adore ce qu'elle fait ! Rejoignez une équipe toujours souriante.", good: false, why: "Ton infantilisant et subjectif, inadapté pour une annonce professionnelle sérieuse." },
+];
+
+const MISSIONS_BUILD = [
+  {
+    id: "m1", slot: "Mission 1 — Production quotidienne",
+    versions: [
+      { id: "a", text: "Fabriquer quotidiennement les pains traditionnels et spéciaux (environ 12 références) dans le strict respect des recettes maison", correct: true },
+      { id: "b", text: "Assurer la production de l'ensemble de la gamme de pains, en respectant les consignes données et en maintenant un rythme soutenu", correct: false, why: "Trop flou et met la pression. Combien de références ? Quel type de fabrication ?" },
+    ],
+  },
+  {
+    id: "m2", slot: "Mission 2 — Technique de fermentation",
+    versions: [
+      { id: "a", text: "Gérer la production dans une logique agile, optimiser les flux de fabrication et suivre les KPIs de qualité de la boulangerie", correct: false, why: "Jargon managérial/startup incompréhensible pour le cœur de métier d'un boulanger." },
+      { id: "b", text: "Conduire les fermentations au levain naturel : réaliser le pointage, le façonnage, l'apprêt, tout en respectant les temps de pousse", correct: true },
+    ],
+  },
+  {
+    id: "m3", slot: "Mission 3 — Cuisson",
+    versions: [
+      { id: "a", text: "Cuire au four à sole : maîtrise précise des températures, de la buée et des temps de cuisson selon les spécificités des produits", correct: true },
+      { id: "b", text: "Piloter la cuisson transversale des produits en coordination avec les équipes de vente pour garantir un réassort continu des vitrines", correct: false, why: "« Transversale » est du jargon inutile. La mission doit être technique, pas marketing." },
+    ],
+  },
+  {
+    id: "m4", slot: "Mission 4 — Hygiène et qualité",
+    versions: [
+      { id: "a", text: "Effectuer diverses tâches de nettoyage, d'entretien et d'hygiène de l'espace de travail, selon les plannings affichés dans le laboratoire", correct: false, why: "« Diverses tâches » est une expression fourre-tout qui masque la réalité de la mission." },
+      { id: "b", text: "Appliquer et faire respecter les normes HACCP : nettoyage rigoureux du fournil, traçabilité des matières, contrôle des températures", correct: true },
+    ],
+  },
+  {
+    id: "m5", slot: "Mission 5 — Transmission",
+    versions: [
+      { id: "a", text: "Accompagner nos apprentis dans l'acquisition des gestes techniques de base de la boulangerie (étapes de pétrissage et de façonnage)", correct: true },
+      { id: "b", text: "Manager les profils juniors de l'équipe, assurer leur montée en compétences globale et réaliser les entretiens individuels d'évaluation", correct: false, why: "Ceci correspond à une fiche de poste de manager/chef, pas de boulanger classique." },
+    ],
+  },
+];
+
+const PROFIL_ITEMS = [
+  { id: "c1", text: "Diplôme de niveau CAP Boulanger minimum", category: "indispensable" },
+  { id: "c2", text: "Excellente maîtrise du four à sole et du levain naturel", category: "indispensable" },
+  { id: "c3", text: "Candidat(e) de langue maternelle française (natif)", category: "interdit", fix: "Maîtrise du français oral et écrit" },
+  { id: "c4", text: "Connaissance pointue des normes d'hygiène HACCP", category: "indispensable" },
+  { id: "c5", text: "Expérience préalable en pâtisserie boulangère (viennoiseries)", category: "apprecie" },
+  { id: "c6", text: "Excellente présentation et apparence soignée exigées", category: "interdit", fix: "Sens du contact client et savoir-être" },
+  { id: "c7", text: "Sensibilité affirmée aux circuits courts et aux produits bio", category: "apprecie" },
+  { id: "c8", text: "Grande rigueur, ponctualité infaillible et fort esprit d'équipe", category: "indispensable" },
+  { id: "c9", text: "Profil jeune, dynamique, sportif et très résistant au stress", category: "interdit", fix: "Personnalité enthousiaste, proactive et endurante" },
+  { id: "c10", text: "Maîtrise d'un outil ERP de gestion des stocks (type Notilia)", category: "apprecie" },
+];
+
+const CONDITIONS_FIELDS = [
+  {
+    id: "salaire", label: "Rémunération",
+    options: [
+      { id: "a", text: "Rémunération très attractive et évolutive, à définir précisément selon votre profil, vos compétences et votre implication", correct: false, why: "Le fameux « selon profil » fait fuir les candidats. Il faut donner une fourchette claire." },
+      { id: "b", text: "Entre 24 000 et 28 000 € brut annuel selon expérience préalable + prime mensuelle de panification sur objectifs", correct: true, why: "Fourchette claire, avantage spécifique inclus. Transparence totale dès la lecture." },
+    ],
+  },
+  {
+    id: "horaires", label: "Horaires et contraintes",
+    options: [
+      { id: "a", text: "Disponibilité totale et flexibilité requises, travail très régulier les week-ends, et présence indispensable lors des jours fériés", correct: false, why: "« Disponibilité totale » est source de stress, vague et potentiellement discriminant (famille)." },
+      { id: "b", text: "Horaires fixes : 4h00 – 12h00, du mardi au samedi. Les jours fériés sont travaillés selon un roulement défini (environ 6/an)", correct: true, why: "Horaires extrêmement précis et chiffrés. Le candidat peut projeter son organisation de vie." },
+    ],
+  },
+  {
+    id: "avantages", label: "Avantages",
+    options: [
+      { id: "a", text: "Mutuelle prise en charge à 60%, pain offert chaque jour, forfait mobilité durable (vélo), formation continue aux techniques bio", correct: true, why: "Des avantages concrets, quantifiables et surtout cohérents avec l'image RSE de la boulangerie." },
+      { id: "b", text: "Excellente ambiance de travail garantie, équipe jeune et très sympa, cadre de travail agréable en plein centre-ville", correct: false, why: "Ce ne sont pas de vrais avantages contractuels mais des affirmations subjectives invérifiables." },
+    ],
+  },
+  {
+    id: "processus", label: "Processus de recrutement",
+    options: [
+      { id: "a", text: "Envoyez-nous rapidement votre CV détaillé par email. Nous étudierons votre candidature et vous recontacterons si profil adéquat", correct: false, why: "Opaque. Le candidat ne connaît ni les étapes, ni les délais, ni le mode d'évaluation." },
+      { id: "b", text: "CV + LM à recrutement@fournil-halles.fr. Processus : présélection (3j) → entretien (45 min) → essai au fournil (1 mat.) → réponse (10j)", correct: true, why: "La transparence parfaite : contacts, durée de chaque étape et délai de réponse garanti." },
+    ],
+  },
+];
+
+// ═══════════════════════════════════════════════════
+// STYLES
+// ═══════════════════════════════════════════════════
+const C = {
+  bg: "#f8f9fb", white: "#ffffff", text: "#1e293b", textLight: "#64748b", textMuted: "#94a3b8",
+  accent: "#4338ca", accentLight: "#e0e7ff", accentSoft: "#eef2ff",
+  warm: "#b45309", warmBg: "#fffbeb",
+  ok: "#059669", okBg: "#ecfdf5", okBorder: "#a7f3d0",
+  err: "#dc2626", errBg: "#fef2f2", errBorder: "#fecaca",
+  border: "#e2e8f0", borderLight: "#f1f5f9",
+  shadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+};
+
+const btnP = {
+  padding: "11px 32px", background: C.accent, color: "#fff", border: "none",
+  borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer",
+  fontFamily: "'Plus Jakarta Sans',sans-serif", boxShadow: "0 2px 8px rgba(67,56,202,0.25)",
+  transition: "all 0.2s"
+};
+
+// ═══════════════════════════════════════════════════
+// SHARED COMPONENTS
+// ═══════════════════════════════════════════════════
+function Card({ children, style, onClick }) {
+  return (
+    <div onClick={onClick} style={{
+      background: C.white, border: `1.5px solid ${C.border}`, borderRadius: 14,
+      padding: "16px 20px", cursor: onClick ? "pointer" : "default", transition: "all 0.2s",
+      boxShadow: C.shadow, ...style
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function Badge({ children, color = C.accent }) {
+  return (
+    <span style={{
+      display: "inline-block", padding: "4px 12px", borderRadius: 999,
+      fontSize: 12, fontWeight: 600, background: `${color}15`, color, border: `1px solid ${color}30`
+    }}>
+      {children}
+    </span>
+  );
+}
+
+function StepDots({ steps, current }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 24, flexWrap: "wrap" }}>
+      {steps.map((s, i) => (
+        <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center",
+            justifyContent: "center", fontSize: 12, fontWeight: 700,
+            background: i < current ? C.ok : i === current ? C.accent : C.borderLight,
+            color: i <= current ? "#fff" : C.textMuted, transition: "all 0.3s"
+          }}>
+            {i < current ? "✓" : i + 1}
+          </div>
+          {i === current && <span style={{ fontSize: 12, fontWeight: 600, color: C.text }}>{s.label}</span>}
+          {i < steps.length - 1 && <div style={{ width: 16, height: 2, background: i < current ? C.ok : C.border, borderRadius: 2 }} />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// OptionPicker repensé : on ne montre plus la correction immédiatement !
+function OptionPicker({ options, selected, onSelect }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {options.map((opt) => {
+        const isSel = selected === opt.id;
+        let brd = isSel ? C.accent : C.border;
+        let bg = isSel ? C.accentSoft : C.white;
+
+        return (
+          <div key={opt.id} onClick={() => onSelect(opt.id)} style={{
+            padding: "12px 16px", borderRadius: 10, cursor: "pointer",
+            transition: "all 0.2s", border: `2px solid ${brd}`, background: bg
+          }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+              <div style={{
+                width: 20, height: 20, borderRadius: "50%", flexShrink: 0, marginTop: 1,
+                border: isSel ? "none" : `2px solid ${C.border}`,
+                background: isSel ? C.accent : "transparent",
+                display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700
+              }}>
+                {isSel ? "●" : ""}
+              </div>
+              <span style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>{opt.text}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// INTRO
+// ═══════════════════════════════════════════════════
+function IntroPhase({ onNext }) {
+  return (
+    <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
+      <div style={{ width: 80, height: 80, borderRadius: 20, margin: "0 auto 20px", background: C.warmBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, boxShadow: C.shadow }}>🥖</div>
+      <h1 style={{ fontFamily: "'Fraunces',serif", fontSize: 32, fontWeight: 700, color: C.text, marginBottom: 10, lineHeight: 1.2 }}>Rédiger une annonce d'emploi</h1>
+      <p style={{ color: C.textLight, fontSize: 14, marginBottom: 6 }}>Compétence visée : <strong style={{ color: C.text }}>rédiger une annonce claire, non discriminante et attractive</strong></p>
+      <p style={{ color: C.textMuted, fontSize: 14, lineHeight: 1.7, marginBottom: 32, maxWidth: 520, margin: "0 auto 32px" }}>
+        Vous êtes responsable RH de la boulangerie <strong style={{ color: C.text }}>Le Fournil des Halles</strong> à Rennes. Vous devez recruter un(e) boulanger(ère) en CDI.
+      </p>
+
+      <div style={{ display: "flex", gap: 12, marginBottom: 32, textAlign: "left" }}>
+        {[
+          { icon: "🔍", title: "Tri express", desc: "Classez 8 formulations : acceptables ou discriminantes" },
+          { icon: "🏗️", title: "Construction", desc: "Assemblez l'annonce complète en 5 étapes" },
+          { icon: "📋", title: "Bilan détaillé", desc: "Visualisez votre score et la correction détaillée à la fin" },
+        ].map((item) => (
+          <Card key={item.title} style={{ flex: 1, padding: "14px 16px" }}>
+            <div style={{ fontSize: 22, marginBottom: 6 }}>{item.icon}</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 4 }}>{item.title}</div>
+            <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.5 }}>{item.desc}</div>
+          </Card>
+        ))}
+      </div>
+
+      <Card style={{ textAlign: "left", background: C.warmBg, border: "1px solid #fde68a", marginBottom: 32 }}>
+        <div style={{ fontSize: 13, color: C.warm, fontWeight: 700, marginBottom: 6 }}>📌 Contexte — {BAKERY_CONTEXT.nom}</div>
+        <p style={{ fontSize: 13, color: "#78350f", lineHeight: 1.7, margin: 0 }}>{BAKERY_CONTEXT.desc}</p>
+      </Card>
+
+      <button onClick={onNext} style={{ ...btnP, padding: "14px 48px", fontSize: 16 }}>Commencer l'exercice →</button>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// TRI EXPRESS (Immédiat)
+// ═══════════════════════════════════════════════════
+function TriPhase({ onNext, score, setScore }) {
+  const [cur, setCur] = useState(0);
+  const [ans, setAns] = useState(null);
+
+  const item = TRI_ITEMS[cur];
+  const done = ans !== null;
+  const ok = ans === item.bad;
+
+  const pick = (v) => {
+    if (done) return;
+    setAns(v);
+    if (v === item.bad) setScore((s) => s + 1);
+  };
+
+  const next = () => {
+    if (cur < TRI_ITEMS.length - 1) {
+      setCur((c) => c + 1);
+      setAns(null);
+    } else {
+      onNext();
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: 640, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <div>
+          <h2 style={{ fontFamily: "'Fraunces',serif", color: C.text, fontSize: 22, margin: 0 }}>Tri express</h2>
+          <p style={{ color: C.textMuted, fontSize: 13, margin: "4px 0 0" }}>Cette formulation peut-elle figurer dans une annonce ?</p>
+        </div>
+        <Badge>{cur + 1} / {TRI_ITEMS.length}</Badge>
+      </div>
+
+      <Card style={{ marginBottom: 20, background: C.accentSoft, border: `1px solid ${C.accentLight}` }}>
+        <div style={{ fontSize: 17, color: C.text, lineHeight: 1.7, fontWeight: 500, padding: "8px 0", textAlign: "center" }}>
+          « {item.text} »
+        </div>
+      </Card>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 8 }}>
+        {[
+          { val: false, label: "✅ Acceptable", sub: "Peut figurer dans l'annonce", goodC: C.ok },
+          { val: true, label: "⚠️ Discriminante", sub: "À reformuler", goodC: C.err },
+        ].map((opt) => {
+          const isSel = ans === opt.val;
+          const isRight = done && opt.val === item.bad;
+          const isWrong = done && isSel && !ok;
+          let brd = C.border, bg = C.white;
+
+          if (isRight) { brd = opt.goodC; bg = opt.val ? C.errBg : C.okBg; }
+          if (isWrong) { brd = C.err; bg = C.errBg; }
+
+          return (
+            <div key={String(opt.val)} onClick={() => pick(opt.val)} style={{
+              padding: "18px 16px", borderRadius: 12, textAlign: "center", cursor: done ? "default" : "pointer",
+              transition: "all 0.2s", opacity: done && !isRight && !isWrong ? 0.4 : 1, border: `2px solid ${brd}`,
+              background: bg, boxShadow: C.shadow
+            }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: C.text, marginBottom: 4 }}>{opt.label}</div>
+              <div style={{ fontSize: 12, color: C.textMuted }}>{opt.sub}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {done && (
+        <div style={{ animation: "fadeSlideIn 0.3s" }}>
+          <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 10, fontSize: 13, lineHeight: 1.6, background: ok ? C.okBg : C.errBg, border: `1px solid ${ok ? C.okBorder : C.errBorder}`, color: ok ? "#065f46" : "#991b1b" }}>
+            <span style={{ fontWeight: 700, marginRight: 6 }}>{ok ? "✓" : "✗"}</span>
+            {item.bad ? <>Catégorie : <strong>{item.cat}</strong>. Reformulation : « {item.fix} »</> : "Cette formulation est factuelle et légale."}
+          </div>
+          <div style={{ textAlign: "right", marginTop: 16 }}>
+            <button onClick={next} style={btnP}>{cur < TRI_ITEMS.length - 1 ? "Suivant →" : "Construire l'annonce →"}</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// CONSTRUCTION WRAPPER
+// ═══════════════════════════════════════════════════
+function ConstructionPhase({ onNext, cAns, setCAns }) {
+  const [step, setStep] = useState(0);
+
+  const nextStep = () => {
+    if (step < STEPS.length - 1) setStep(s => s + 1);
+    else onNext();
+  };
+
+  return (
+    <div style={{ maxWidth: 720, margin: "0 auto" }}>
+      <div style={{ marginBottom: 8 }}>
+        <h2 style={{ fontFamily: "'Fraunces',serif", color: C.text, fontSize: 22, margin: "0 0 4px" }}>🏗️ Construisez votre annonce</h2>
+        <p style={{ color: C.textMuted, fontSize: 13, margin: "0 0 16px" }}>Sélectionnez les meilleures propositions. La correction s'affichera à la fin.</p>
+      </div>
+      <StepDots steps={STEPS} current={step} />
+
+      <div style={{ display: step === 0 ? "block" : "none" }}>
+        <EnteteStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+      <div style={{ display: step === 1 ? "block" : "none" }}>
+        <PresentationStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+      <div style={{ display: step === 2 ? "block" : "none" }}>
+        <MissionsStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+      <div style={{ display: step === 3 ? "block" : "none" }}>
+        <ProfilStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+      <div style={{ display: step === 4 ? "block" : "none" }}>
+        <ConditionsStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+    </div>
+  );
+}
+
+// ─── En-tête ────────────────────────────────────────
+function EnteteStep({ cAns, setCAns, onNext }) {
+  const ans = cAns.entete;
+  const setAns = (id, val) => setCAns(p => ({ ...p, entete: { ...p.entete, [id]: val } }));
+  const allDone = ENTETE_FIELDS.every(f => ans[f.id]);
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 En-tête — Mentions obligatoires</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>Complétez chaque champ en choisissant la formulation correcte.</p>
+      </Card>
+      {ENTETE_FIELDS.map(f => (
+        <div key={f.id} style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 8 }}>{f.label}</div>
+          <OptionPicker options={f.options} selected={ans[f.id]} onSelect={(val) => setAns(f.id, val)} />
+        </div>
+      ))}
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={!allDone} style={{ ...btnP, opacity: allDone ? 1 : 0.4 }}>Étape suivante →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Présentation ───────────────────────────────────
+function PresentationStep({ cAns, setCAns, onNext }) {
+  const sel = cAns.pres;
+  const toggle = (id) => setCAns(p => ({ ...p, pres: p.pres.includes(id) ? p.pres.filter(x => x !== id) : [...p.pres, id] }));
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 Qui sommes-nous ?</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>Sélectionnez uniquement les éléments factuels et crédibles. Rejetez le greenwashing.</p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+        {PRESENTATION_BLOCKS.map(b => {
+          const isSel = sel.includes(b.id);
+          return (
+            <div key={b.id} onClick={() => toggle(b.id)} style={{
+              padding: "14px 18px", borderRadius: 12, cursor: "pointer", transition: "all 0.2s",
+              border: `2px solid ${isSel ? C.accent : C.border}`, background: isSel ? C.accentSoft : C.white
+            }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <div style={{
+                  width: 22, height: 22, borderRadius: 6, flexShrink: 0, marginTop: 1, border: isSel ? "none" : `2px solid ${C.border}`,
+                  background: isSel ? C.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 700
+                }}>{isSel ? "✓" : ""}</div>
+                <span style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>{b.text}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={sel.length === 0} style={{ ...btnP, opacity: sel.length ? 1 : 0.4 }}>Étape suivante →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Missions ───────────────────────────────────────
+function MissionsStep({ cAns, setCAns, onNext }) {
+  const ans = cAns.missions;
+  const setAns = (id, val) => setCAns(p => ({ ...p, missions: { ...p.missions, [id]: val } }));
+  const allDone = MISSIONS_BUILD.every(m => ans[m.id]);
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 Vos missions</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>Pour chaque mission, choisissez la formulation la plus concrète et objective.</p>
+      </Card>
+      {MISSIONS_BUILD.map(m => (
+        <div key={m.id} style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: C.accent, marginBottom: 8 }}>{m.slot}</div>
+          <OptionPicker options={m.versions} selected={ans[m.id]} onSelect={(val) => setAns(m.id, val)} />
+        </div>
+      ))}
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={!allDone} style={{ ...btnP, opacity: allDone ? 1 : 0.4 }}>Étape suivante →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Profil (Nouvelle UI de "peinture") ─────────────────────────────────────────
+function ProfilStep({ cAns, setCAns, onNext }) {
+  const pl = cAns.profil;
+  const setPl = (id, cat) => setCAns(p => ({ ...p, profil: { ...p.profil, [id]: cat } }));
+  const [activeTool, setActiveTool] = useState(null);
+
+  const cats = [
+    { id: "indispensable", label: "Indispensable", color: C.accent, bg: C.accentSoft },
+    { id: "apprecie", label: "Apprécié", color: C.warm, bg: C.warmBg },
+    { id: "interdit", label: "À supprimer", color: C.err, bg: C.errBg },
+  ];
+
+  const allPlaced = PROFIL_ITEMS.every(i => pl[i.id]);
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 Profil recherché</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>
+          1. Cliquez sur l'une des 3 bulles ci-dessous pour la sélectionner.<br />
+          2. Cliquez ensuite sur les critères pour leur appliquer ce choix.
+        </p>
+      </Card>
+
+      {/* Toolbar */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", justifyContent: "center", padding: "10px", background: "#fff", borderRadius: 12, border: `1px solid ${C.border}` }}>
+        {cats.map(c => {
+          const isActive = activeTool === c.id;
+          return (
+            <button key={c.id} onClick={() => setActiveTool(isActive ? null : c.id)} style={{
+              padding: "8px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600, border: `2px solid ${isActive ? c.color : "transparent"}`,
+              background: isActive ? c.color : c.bg, color: isActive ? "#fff" : c.color, cursor: "pointer", transition: "all 0.2s", transform: isActive ? "scale(1.05)" : "scale(1)"
+            }}>
+              {c.label} {isActive && "🖌️"}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+        {PROFIL_ITEMS.map(item => {
+          const cat = cats.find(c => c.id === pl[item.id]);
+          return (
+            <div key={item.id} onClick={() => activeTool && setPl(item.id, activeTool)} style={{
+              padding: "12px 16px", borderRadius: 10, cursor: activeTool ? "pointer" : "default", transition: "all 0.2s",
+              border: `2px solid ${cat ? `${cat.color}60` : C.border}`, background: cat ? `${cat.color}08` : C.white,
+              display: "flex", alignItems: "center", justifyContent: "space-between"
+            }}>
+              <span style={{ fontSize: 14, color: C.text }}>{item.text}</span>
+              <span style={{
+                padding: "4px 12px", borderRadius: 999, fontSize: 11, fontWeight: 700,
+                background: cat ? `${cat.color}15` : C.borderLight, color: cat ? cat.color : C.textMuted,
+                border: `1px solid ${cat ? `${cat.color}30` : C.border}`, minWidth: 90, textAlign: "center"
+              }}>
+                {cat ? cat.label : "À classer"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={!allPlaced} style={{ ...btnP, opacity: allPlaced ? 1 : 0.4 }}>Étape suivante →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Conditions ─────────────────────────────────────
+function ConditionsStep({ cAns, setCAns, onNext }) {
+  const ans = cAns.conditions;
+  const setAns = (id, val) => setCAns(p => ({ ...p, conditions: { ...p.conditions, [id]: val } }));
+  const allDone = CONDITIONS_FIELDS.every(f => ans[f.id]);
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 Conditions, avantages & candidature</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>Dernière partie. Transparence, précision et cohérence RSE.</p>
+      </Card>
+      {CONDITIONS_FIELDS.map(f => (
+        <div key={f.id} style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 8 }}>{f.label}</div>
+          <OptionPicker options={f.options} selected={ans[f.id]} onSelect={(val) => setAns(f.id, val)} />
+        </div>
+      ))}
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={!allDone} style={{ ...btnP, opacity: allDone ? 1 : 0.4 }}>Voir le bilan →</button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// BILAN (Avec correction détaillée)
+// ═══════════════════════════════════════════════════
+function BilanPhase({ scoreTri, cAns, onRestart }) {
+  const [tab, setTab] = useState("score"); // 'score', 'correction', 'rules'
+
+  // Calcul du score de la phase Construction
+  let scoreConst = 0;
+  // Entete (max 8)
+  ENTETE_FIELDS.forEach(f => { if (f.options.find(o => o.id === cAns.entete[f.id])?.correct) scoreConst += 2; });
+  // Pres (max 6)
+  const presGood = PRESENTATION_BLOCKS.filter(b => b.good).map(b => b.id);
+  const presPts = Math.max(0, cAns.pres.filter(id => presGood.includes(id)).length * 2 - cAns.pres.filter(id => !presGood.includes(id)).length);
+  scoreConst += presPts;
+  // Missions (max 10)
+  MISSIONS_BUILD.forEach(m => { if (m.versions.find(v => v.id === cAns.missions[m.id])?.correct) scoreConst += 2; });
+  // Profil (max 10)
+  PROFIL_ITEMS.forEach(i => { if (cAns.profil[i.id] === i.category) scoreConst += 1; });
+  // Conditions (max 8)
+  CONDITIONS_FIELDS.forEach(f => { if (f.options.find(o => o.id === cAns.conditions[f.id])?.correct) scoreConst += 2; });
+
+  const maxConst = 42;
+  const total = scoreTri + scoreConst;
+  const max = 8 + maxConst;
+  const pct = Math.round((total / max) * 100);
+
+  const grade = pct >= 85 ? { label: "Expert(e) en rédaction", emoji: "🏆", color: "#b45309" }
+    : pct >= 65 ? { label: "Bon(ne) rédacteur(trice)", emoji: "🎯", color: C.ok }
+      : pct >= 40 ? { label: "En progression", emoji: "📈", color: C.warm }
+        : { label: "À approfondir", emoji: "📚", color: C.err };
+
+  // Helper pour afficher une erreur de correction
+  const CorrectionItem = ({ title, status, desc, why }) => (
+    <div style={{ background: status ? C.okBg : C.errBg, border: `1px solid ${status ? C.okBorder : C.errBorder}`, padding: "12px 16px", borderRadius: 10, marginBottom: 12 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: status ? "#065f46" : "#991b1b", marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 13, color: C.text, marginBottom: why ? 6 : 0 }}>{desc}</div>
+      {why && <div style={{ fontSize: 12, color: status ? "#065f46" : "#991b1b", fontStyle: "italic", borderTop: `1px solid ${status ? C.okBorder : C.errBorder}`, paddingTop: 6, marginTop: 6 }}>{why}</div>}
+    </div>
+  );
+
+  return (
+    <div style={{ maxWidth: 700, margin: "0 auto" }}>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ fontSize: 56, marginBottom: 8 }}>{grade.emoji}</div>
+        <h2 style={{ fontFamily: "'Fraunces',serif", color: grade.color, fontSize: 26, marginBottom: 6 }}>{grade.label}</h2>
+        <p style={{ color: C.textMuted, fontSize: 15 }}>Score total : <strong style={{ color: C.text, fontSize: 18 }}>{total}</strong> / {max} <span style={{ marginLeft: 8 }}>({pct}%)</span></p>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 24 }}>
+        {[
+          { id: "score", label: "Mon Score" },
+          { id: "correction", label: "Correction détaillée" },
+          { id: "rules", label: "Les 5 règles d'or" }
+        ].map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            padding: "8px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer",
+            background: tab === t.id ? C.accent : C.borderLight, color: tab === t.id ? "#fff" : C.textMuted
+          }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "score" && (
+        <div className="fadeSlide">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
+            {[
+              { k: "tri", icon: "🔍", label: "Tri express", score: scoreTri, max: 8 },
+              { k: "const", icon: "🏗️", label: "Construction", score: scoreConst, max: maxConst }
+            ].map((item) => {
+              const p = Math.round((item.score / item.max) * 100);
+              return (
+                <Card key={item.k}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}><span style={{ fontSize: 22 }}>{item.icon}</span><span style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{item.label}</span></div>
+                  <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 6 }}>{item.score} / {item.max} points</div>
+                  <div style={{ width: "100%", background: C.borderLight, borderRadius: 999, height: 8, overflow: "hidden" }}>
+                    <div style={{ width: `${p}%`, height: "100%", background: p >= 70 ? C.ok : p >= 40 ? C.warm : C.err, borderRadius: 999 }} />
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+          <div style={{ textAlign: "center", marginTop: 40 }}>
+            <button onClick={() => setTab("correction")} style={{ ...btnP, background: C.white, color: C.accent, border: `2px solid ${C.accent}` }}>Voir mes erreurs →</button>
+          </div>
+        </div>
+      )}
+
+      {tab === "correction" && (
+        <div className="fadeSlide">
+          <Card style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: 16, color: C.text, margin: "0 0 16px" }}>En-tête</h3>
+            {ENTETE_FIELDS.map(f => {
+              const userOpt = f.options.find(o => o.id === cAns.entete[f.id]);
+              const correctOpt = f.options.find(o => o.correct);
+              const ok = userOpt?.correct;
+              return <CorrectionItem key={f.id} title={f.label} status={ok} desc={ok ? userOpt.text : <>Votre choix : {userOpt?.text || "Aucun"}<br />Attendu : {correctOpt.text}</>} why={userOpt?.why} />
+            })}
+          </Card>
+          <Card style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: 16, color: C.text, margin: "0 0 16px" }}>Missions</h3>
+            {MISSIONS_BUILD.map(m => {
+              const userOpt = m.versions.find(o => o.id === cAns.missions[m.id]);
+              const correctOpt = m.versions.find(o => o.correct);
+              const ok = userOpt?.correct;
+              return <CorrectionItem key={m.id} title={m.slot} status={ok} desc={ok ? userOpt.text : <>Votre choix : {userOpt?.text || "Aucun"}<br />Attendu : {correctOpt.text}</>} why={userOpt?.why} />
+            })}
+          </Card>
+          <Card style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: 16, color: C.text, margin: "0 0 16px" }}>Profil</h3>
+            {PROFIL_ITEMS.map(i => {
+              const userCat = cAns.profil[i.id];
+              const ok = userCat === i.category;
+              return <CorrectionItem key={i.id} title={i.text} status={ok} desc={ok ? `Bien classé dans : ${i.category}` : `Vous l'avez classé : ${userCat || "Non classé"} | Attendu : ${i.category}`} why={i.fix ? `Reformulation conseillée : ${i.fix}` : null} />
+            })}
+          </Card>
+        </div>
+      )}
+
+      {tab === "rules" && (
+        <div className="fadeSlide">
+          <Card style={{ background: C.warmBg, border: "1px solid #fde68a" }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: C.warm, marginBottom: 12 }}>📌 Les 5 règles d'or</div>
+            <div style={{ fontSize: 14, color: "#78350f", lineHeight: 1.8 }}>
+              {[
+                ["Sincérité = rétention", "une annonce alignée sur la réalité évite les départs précoces."],
+                ["Zéro discrimination", "chaque critère discriminant doit être remplacé par la compétence réelle visée."],
+                ["La RSE se prouve", "des faits chiffrés et vérifiables, jamais des slogans."],
+                ["Clarté = candidatures qualifiées", "missions précises, fourchette salariale, processus transparent."],
+                ["C'est la loi", "discrimination à l'embauche = jusqu'à 45 000 € d'amende et 3 ans d'emprisonnement."],
+              ].map(([t, d], i) => <p key={i} style={{ margin: "0 0 10px" }}><strong style={{ color: "#92400e" }}>{i + 1}. {t} :</strong> {d}</p>)}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      <div style={{ textAlign: "center", marginTop: 30, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
+        <button onClick={onRestart} style={{ padding: "8px 24px", borderRadius: 8, fontSize: 14, cursor: "pointer", background: C.borderLight, color: C.text, border: "none", fontWeight: 600 }}>🔄 Recommencer l'exercice</button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// MAIN (Navigation via Tabs)
+// ═══════════════════════════════════════════════════
+export default function App() {
+  const [phase, setPhase] = useState(0); // 0: Intro, 1: Tri, 2: Const, 3: Bilan
+
+  // États partagés pour persistance lors de la navigation
+  const [scoreTri, setScoreTri] = useState(0);
+  const [cAns, setCAns] = useState({
+    entete: {},
+    pres: [],
+    missions: {},
+    profil: {},
+    conditions: {}
+  });
+
+  const restart = () => {
+    setPhase(0);
+    setScoreTri(0);
+    setCAns({ entete: {}, pres: [], missions: {}, profil: {}, conditions: {} });
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Plus Jakarta Sans',sans-serif", color: C.text }}>
+      <style>{`
+         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+         .fadeSlide { animation: fadeSlideIn 0.4s forwards; }
+         @keyframes fadeSlideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+         * { box-sizing:border-box; }
+       `}</style>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 24px" }}>
+
+        {/* Navigation Tabs */}
+        {phase > 0 && (
+          <div style={{ marginBottom: 28 }}>
+            <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+              {PHASES.slice(1).map((p, i) => {
+                const stepIdx = i + 1; // 1, 2, 3
+                return (
+                  <div key={p.id} onClick={() => setPhase(stepIdx)} style={{
+                    fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 999, cursor: "pointer", transition: "all 0.2s",
+                    background: stepIdx === phase ? C.accent : C.borderLight,
+                    color: stepIdx === phase ? "#fff" : C.textMuted,
+                  }}>
+                    {p.label}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ width: "100%", background: C.borderLight, borderRadius: 999, height: 6, overflow: "hidden" }}>
+              <div style={{
+                width: `${Math.round((phase / (PHASES.length - 1)) * 100)}%`, height: "100%",
+                background: `linear-gradient(90deg,${C.accent},#818cf8)`, borderRadius: 999,
+                transition: "width 0.4s cubic-bezier(.4,0,.2,1)"
+              }} />
+            </div>
+          </div>
+        )}
+
+        {/* Container principal. On utilise 'display' au lieu de destruction conditionnelle pour conserver l'état de TriPhase et ConstructionPhase */}
+        <div style={{ display: phase === 0 ? "block" : "none" }}>
+          <IntroPhase onNext={() => setPhase(1)} />
+        </div>
+        <div style={{ display: phase === 1 ? "block" : "none" }}>
+          <TriPhase onNext={() => setPhase(2)} score={scoreTri} setScore={setScoreTri} />
+        </div>
+        <div style={{ display: phase === 2 ? "block" : "none" }}>
+          <ConstructionPhase onNext={() => setPhase(3)} cAns={cAns} setCAns={setCAns} />
+        </div>
+        <div style={{ display: phase === 3 ? "block" : "none" }}>
+          <BilanPhase scoreTri={scoreTri} cAns={cAns} onRestart={restart} />
+        </div>
+
+      </div>
+    </div>
+  );
+}
