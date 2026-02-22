@@ -1,1489 +1,824 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=1920, height=1080">
-    <title>Sélectionner les canaux de recrutement - Boulangeries Ange</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --ange-lime: #c8d223;
-            --ange-vert: #195850;
-            --ange-bleu: #273c86;
-            --blanc: #ffffff;
-            --gris-clair: #f8f9fa;
-            --gris-moyen: #e9ecef;
-            --gris-texte: #495057;
-            --succes: #28a745;
-            --erreur: #dc3545;
-            --attention: #ffc107;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Source Sans 3', sans-serif;
-            background: var(--blanc);
-            width: 1920px;
-            height: 1080px;
-            overflow: hidden;
-            color: var(--gris-texte);
-        }
-
-        .container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* En-tête */
-        .header {
-            background: var(--ange-bleu);
-            padding: 18px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .header h1 {
-            font-family: 'Playfair Display', serif;
-            color: white;
-            font-size: 26px;
-            font-weight: 600;
-        }
-
-        .header .badge {
-            background: var(--ange-lime);
-            color: var(--ange-bleu);
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Zone principale */
-        .main-content {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Slides */
-        .slide {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            padding: 35px 50px;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .slide.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ========== SLIDE INTRO ========== */
-        .intro-slide {
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background: linear-gradient(135deg, var(--blanc) 0%, var(--gris-clair) 100%);
-        }
-
-        .intro-icon {
-            width: 100px;
-            height: 100px;
-            background: var(--ange-vert);
-            border-radius: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            box-shadow: 0 12px 35px rgba(25, 88, 80, 0.3);
-        }
-
-        .intro-icon svg {
-            width: 50px;
-            height: 50px;
-            fill: white;
-        }
-
-        .intro-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 38px;
-            color: var(--ange-bleu);
-            margin-bottom: 20px;
-        }
-
-        .intro-text {
-            font-size: 18px;
-            color: var(--gris-texte);
-            max-width: 800px;
-            line-height: 1.7;
-            margin-bottom: 35px;
-        }
-
-        .intro-objectives {
-            display: flex;
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .objective-card {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-left: 4px solid var(--ange-lime);
-        }
-
-        .objective-card svg {
-            width: 28px;
-            height: 28px;
-            fill: var(--ange-vert);
-        }
-
-        .objective-card span {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--ange-bleu);
-        }
-
-        .start-btn {
-            background: var(--ange-vert);
-            color: white;
-            border: none;
-            padding: 16px 50px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .start-btn:hover {
-            background: #13443e;
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(25, 88, 80, 0.4);
-        }
-
-        /* ========== SLIDES SITUATIONS ========== */
-        .situation-slide {
-            gap: 35px;
-        }
-
-        .situation-panel {
-            flex: 0 0 480px;
-            background: white;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            border-left: 5px solid var(--ange-vert);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .situation-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--ange-bleu);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 18px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            width: fit-content;
-        }
-
-        .situation-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 22px;
-            color: var(--ange-bleu);
-            margin-bottom: 20px;
-            line-height: 1.3;
-        }
-
-        .situation-details {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .detail-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 12px 15px;
-            background: var(--gris-clair);
-            border-radius: 10px;
-        }
-
-        .detail-icon {
-            width: 38px;
-            height: 38px;
-            background: var(--ange-bleu);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .detail-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
-        }
-
-        .detail-content h4 {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #6c757d;
-            margin-bottom: 3px;
-        }
-
-        .detail-content p {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--gris-texte);
-            line-height: 1.4;
-        }
-
-        .urgency-high { border-left: 3px solid var(--erreur); }
-        .urgency-medium { border-left: 3px solid var(--attention); }
-        .urgency-low { border-left: 3px solid var(--succes); }
-
-        /* Colonne choix */
-        .choices-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .choices-instruction {
-            font-size: 15px;
-            color: var(--gris-texte);
-            margin-bottom: 18px;
-            padding-left: 12px;
-            border-left: 3px solid var(--ange-lime);
-        }
-
-        .choices-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .choice-btn {
-            background: white;
-            border: 2px solid var(--gris-moyen);
-            border-radius: 12px;
-            padding: 15px 12px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            gap: 8px;
-            min-height: 110px;
-        }
-
-        .choice-btn:hover:not(.selected):not(.disabled) {
-            border-color: var(--ange-vert);
-            background: rgba(25, 88, 80, 0.05);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(25, 88, 80, 0.12);
-        }
-
-        .choice-btn.selected {
-            border-color: var(--ange-bleu);
-            background: rgba(39, 60, 134, 0.08);
-        }
-
-        .choice-btn.optimal {
-            border-color: var(--succes);
-            background: rgba(40, 167, 69, 0.12);
-            box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
-        }
-
-        .choice-btn.correct {
-            border-color: var(--ange-vert);
-            background: rgba(25, 88, 80, 0.08);
-        }
-
-        .choice-btn.incorrect {
-            border-color: var(--erreur);
-            background: rgba(220, 53, 69, 0.05);
-            opacity: 0.7;
-        }
-
-        .choice-btn.disabled { cursor: default; }
-
-        .choice-icon {
-            width: 42px;
-            height: 42px;
-            background: var(--gris-clair);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .choice-btn.selected .choice-icon { background: var(--ange-bleu); }
-        .choice-btn.optimal .choice-icon { background: var(--succes); }
-        .choice-btn.correct .choice-icon { background: var(--ange-vert); }
-
-        .choice-icon svg {
-            width: 22px;
-            height: 22px;
-            fill: var(--ange-bleu);
-        }
-
-        .choice-btn.selected .choice-icon svg,
-        .choice-btn.optimal .choice-icon svg,
-        .choice-btn.correct .choice-icon svg {
-            fill: white;
-        }
-
-        .choice-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--gris-texte);
-            line-height: 1.3;
-        }
-
-        .choice-hint {
-            font-size: 11px;
-            color: #6c757d;
-            display: none;
-            line-height: 1.3;
-        }
-
-        .choice-btn.optimal .choice-hint,
-        .choice-btn.correct .choice-hint,
-        .choice-btn.incorrect .choice-hint {
-            display: block;
-        }
-
-        /* Bouton valider */
-        .validate-section {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-
-        .validate-btn {
-            background: var(--ange-vert);
-            color: white;
-            border: none;
-            padding: 14px 45px;
-            border-radius: 25px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .validate-btn:hover:not(:disabled) {
-            background: #13443e;
-            transform: scale(1.03);
-        }
-
-        .validate-btn:disabled {
-            background: var(--gris-moyen);
-            color: #adb5bd;
-            cursor: not-allowed;
-        }
-
-        /* Feedback */
-        .feedback-panel {
-            display: none;
-            background: white;
-            border-radius: 12px;
-            padding: 18px 22px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid var(--succes);
-            animation: slideUp 0.3s ease;
-            max-height: 180px;
-            overflow-y: auto;
-        }
-
-        .feedback-panel.show { display: block; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .feedback-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-
-        .feedback-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--succes);
-        }
-
-        .feedback-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
-        }
-
-        .feedback-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--succes);
-        }
-
-        .feedback-text {
-            font-size: 13px;
-            line-height: 1.5;
-            color: var(--gris-texte);
-        }
-
-        /* ========== SLIDE RÉSULTAT ========== */
-        .result-slide {
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background: linear-gradient(135deg, var(--blanc) 0%, var(--gris-clair) 100%);
-        }
-
-        .result-icon {
-            width: 100px;
-            height: 100px;
-            background: var(--succes);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
-            box-shadow: 0 12px 35px rgba(40, 167, 69, 0.3);
-        }
-
-        .result-icon svg {
-            width: 50px;
-            height: 50px;
-            fill: white;
-        }
-
-        .result-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 36px;
-            color: var(--ange-bleu);
-            margin-bottom: 15px;
-        }
-
-        .result-score {
-            font-family: 'Playfair Display', serif;
-            font-size: 72px;
-            color: var(--ange-vert);
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .result-text {
-            font-size: 18px;
-            color: var(--gris-texte);
-            margin-bottom: 35px;
-            max-width: 600px;
-        }
-
-        .result-summary {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 35px;
-        }
-
-        .summary-card {
-            background: white;
-            padding: 25px 40px;
-            border-radius: 15px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid var(--ange-lime);
-        }
-
-        .summary-card h4 {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #6c757d;
-            margin-bottom: 8px;
-        }
-
-        .summary-card .value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--ange-bleu);
-        }
-
-        .restart-btn {
-            background: var(--ange-bleu);
-            color: white;
-            border: none;
-            padding: 16px 50px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .restart-btn:hover {
-            background: #1e3070;
-            transform: scale(1.03);
-        }
-
-        /* ========== NAVIGATION ========== */
-        .navigation {
-            height: 70px;
-            background: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 50px;
-            border-top: 1px solid var(--gris-moyen);
-            flex-shrink: 0;
-        }
-
-        .nav-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 25px;
-            border: 2px solid var(--ange-bleu);
-            background: white;
-            color: var(--ange-bleu);
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .nav-btn:hover:not(:disabled) {
-            background: var(--ange-bleu);
-            color: white;
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .nav-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-        }
-
-        .progress-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .progress-label {
-            font-size: 13px;
-            color: #6c757d;
-            font-weight: 500;
-        }
-
-        .progress-indicators {
-            display: flex;
-            gap: 10px;
-        }
-
-        .progress-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--gris-moyen);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .progress-dot.active {
-            background: var(--ange-bleu);
-            transform: scale(1.3);
-        }
-
-        .progress-dot.completed {
-            background: var(--ange-vert);
-        }
-
-        .score-display {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--gris-clair);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--ange-bleu);
-        }
-
-        .score-display svg {
-            width: 18px;
-            height: 18px;
-            fill: var(--ange-lime);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1>Canaux de recrutement : choisir la bonne stratégie</h1>
-            <span class="badge">Activité pratique</span>
-        </header>
-
-        <div class="main-content">
-            <!-- Slide 0 : Introduction -->
-            <div class="slide intro-slide active" data-slide="0">
-                <div class="intro-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                </div>
-                <h2 class="intro-title">Sélectionner les canaux de recrutement</h2>
-                <p class="intro-text">
-                    Chez <strong>Boulangeries Ange</strong>, le choix des canaux de recrutement est stratégique. 
-                    Il dépend de la nature du poste, du niveau d'urgence et des caractéristiques du bassin d'emploi local.<br><br>
-                    Dans cette activité, vous allez analyser <strong>5 situations concrètes</strong> et 
-                    sélectionner les canaux les plus adaptés à chaque contexte.
-                </p>
-                <div class="intro-objectives">
-                    <div class="objective-card">
-                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-                        <span>Analyser le contexte</span>
-                    </div>
-                    <div class="objective-card">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        <span>Choisir les bons canaux</span>
-                    </div>
-                    <div class="objective-card">
-                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                        <span>Justifier ses choix</span>
-                    </div>
-                </div>
-                <button class="start-btn" onclick="startActivity()">Commencer l'activité</button>
+import React, { useState } from "react";
+
+// ═══════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════
+const PHASES = [
+  { id: "intro", label: "Accueil" },
+  { id: "tri", label: "Tri express" },
+  { id: "construction", label: "Construire l'annonce" },
+  { id: "bilan", label: "Bilan" },
+];
+
+const BAKERY_CONTEXT = {
+  nom: "Le Fournil des Halles",
+  desc: "Boulangerie artisanale de 10 salariés, implantée depuis 12 ans en centre-ville de Rennes. Farines bio livrées par 2 minoteries bretonnes (rayon < 40 km), levain naturel, cuisson au four à sole. Labellisée « Artisan de confiance » depuis 2022. 3 boutiques, 1 fournil central. Collecte des invendus via Too Good To Go depuis 2021.",
+  poste: "Boulanger / Boulangère en CDI",
+};
+
+// ═══════════════════════════════════════════════════
+// PHASE 1 — TRI EXPRESS
+// ═══════════════════════════════════════════════════
+const TRI_ITEMS = [
+  { id: 1, text: "Jeune boulanger dynamique recherché", bad: true, cat: "Âge", fix: "Boulanger(ère) enthousiaste et motivé(e)" },
+  { id: 2, text: "Maîtrise parfaite du français oral et écrit", bad: false },
+  { id: 3, text: "Merci de joindre une photo récente", bad: true, cat: "Apparence", fix: "Merci de joindre CV + lettre de motivation" },
+  { id: 4, text: "Poste avec manutention régulière de charges (25 kg)", bad: false },
+  { id: 5, text: "Homme de terrain, robuste et endurant", bad: true, cat: "Genre", fix: "Personne de terrain, à l'aise dans un environnement physique" },
+  { id: 6, text: "Expérience de 3 ans en boulangerie artisanale souhaitée", bad: false },
+  { id: 7, text: "Disponibilité totale, pas de contraintes familiales", bad: true, cat: "Famille", fix: "Poste en horaires décalés (4h-12h), du mardi au samedi" },
+  { id: 8, text: "Rémunération : 24 000–28 000 € brut/an selon expérience", bad: false },
+];
+
+// ═══════════════════════════════════════════════════
+// PHASE 2 — CONSTRUCTION (Textes équilibrés en longueur)
+// ═══════════════════════════════════════════════════
+const STEPS = [
+  { id: "entete", label: "En-tête", icon: "📌", num: "01" },
+  { id: "presentation", label: "Qui sommes-nous", icon: "🏠", num: "02" },
+  { id: "missions", label: "Missions", icon: "🎯", num: "03" },
+  { id: "profil", label: "Profil recherché", icon: "👤", num: "04" },
+  { id: "conditions", label: "Conditions & RSE", icon: "📋", num: "05" },
+];
+
+const ENTETE_FIELDS = [
+  {
+    id: "intitule", label: "Intitulé du poste",
+    options: [
+      { id: "a", text: "Boulanger qualifié pour rejoindre notre équipe de production matinale", correct: false, why: "Masculin seul, excluant. Ne cible pas la bonne requête." },
+      { id: "b", text: "Boulanger / Boulangère (H/F) en CDI — Rejoignez notre fournil", correct: true, why: "Intitulé inclusif, clair, conforme à la loi et orienté recherche." },
+      { id: "c", text: "Artisan pétrisseur polyvalent passionné par le travail de la pâte", correct: false, why: "Trop original : le candidat ne trouvera pas l'offre en cherchant « boulanger »." },
+    ],
+  },
+  {
+    id: "contrat", label: "Type de contrat",
+    options: [
+      { id: "a", text: "Contrat à Durée Indéterminée (CDI) – Temps plein (35h/semaine)", correct: true, why: "Clair, précis, et juridiquement conforme aux attentes d'un candidat." },
+      { id: "b", text: "CDD de 6 mois avec une forte possibilité d'évolution vers un CDI à l'issue", correct: false, why: "Promettre un CDI à l'issue d'un CDD est juridiquement risqué si non garanti." },
+      { id: "c", text: "CDI avec une période d'essai de 2 mois stricte et potentiellement éliminatoire", correct: false, why: "Le terme « éliminatoire » est menaçant et inadapté pour attirer des talents." },
+    ],
+  },
+  {
+    id: "experience", label: "Expérience demandée",
+    options: [
+      { id: "a", text: "Maximum 5 ans d'expérience souhaitée afin de s'adapter à nos méthodes", correct: false, why: "Un plafond d'expérience est une discrimination indirecte par l'âge." },
+      { id: "b", text: "2 à 4 ans d'expérience réussie en boulangerie artisanale exigée", correct: true, why: "Fourchette raisonnable, contextualisée, sans plafond excluant les plus âgés." },
+      { id: "c", text: "Profil expert senior justifiant d'un minimum de 15 années d'expérience", correct: false, why: "Durée excessive combinée au mot « senior » = discrimination par l'âge." },
+    ],
+  },
+  {
+    id: "localisation", label: "Localisation",
+    options: [
+      { id: "a", text: "Rennes centre (35) — Laboratoire de production du Fournil des Halles", correct: true, why: "Précis : ville, département, lieu de travail exact. Utile pour le trajet." },
+      { id: "b", text: "Bretagne (déplacements ponctuels possibles entre nos différents sites)", correct: false, why: "Trop vague : le candidat ne peut pas évaluer son temps de trajet quotidien." },
+    ],
+  },
+];
+
+const PRESENTATION_BLOCKS = [
+  { id: "p1", text: "Boulangerie artisanale de 10 salariés, comprenant 3 boutiques situées à Rennes et un laboratoire de production central.", good: true, order: 1, why: "Factuel : taille, implantation, structure. Le candidat comprend concrètement l'entreprise." },
+  { id: "p2", text: "Notre passion du pain est notre ADN depuis toujours, nous mettons tout notre cœur et notre amour authentique dans nos fabrications quotidiennes.", good: false, why: "Phrase creuse et jargonneuse. Ne donne aucune information concrète au candidat." },
+  { id: "p3", text: "Farines 100% bio livrées par 2 minoteries bretonnes (rayon < 40 km), utilisation exclusive de levain naturel, et cuisson au four à sole.", good: true, order: 2, why: "Engagements RSE concrets, chiffrés et vérifiables. Le candidat voit la réalité du travail." },
+  { id: "p4", text: "Entreprise fortement engagée, éco-responsable et soucieuse de l'environnement, travaillant dans une démarche globale de développement durable.", good: false, why: "Affirmation sans aucune preuve = greenwashing. La RSE se prouve par des faits." },
+  { id: "p5", text: "Labellisée « Artisan de confiance » depuis 2022 et partenaire du dispositif de collecte des invendus Too Good To Go depuis l'année 2021.", good: true, order: 3, why: "Preuves concrètes : label + dispositif anti-gaspi daté. C'est crédible et vérifiable." },
+  { id: "p6", text: "Nous sommes une grande famille bienveillante, dynamique et chaleureuse qui adore ce qu'elle fait ! Rejoignez une équipe toujours souriante.", good: false, why: "Ton infantilisant et subjectif, inadapté pour une annonce professionnelle sérieuse." },
+];
+
+const MISSIONS_BUILD = [
+  {
+    id: "m1", slot: "Mission 1 — Production quotidienne",
+    versions: [
+      { id: "a", text: "Fabriquer quotidiennement les pains traditionnels et spéciaux (environ 12 références) dans le strict respect des recettes maison", correct: true },
+      { id: "b", text: "Assurer la production de l'ensemble de la gamme de pains, en respectant les consignes données et en maintenant un rythme soutenu", correct: false, why: "Trop flou et met la pression. Combien de références ? Quel type de fabrication ?" },
+    ],
+  },
+  {
+    id: "m2", slot: "Mission 2 — Technique de fermentation",
+    versions: [
+      { id: "a", text: "Gérer la production dans une logique agile, optimiser les flux de fabrication et suivre les KPIs de qualité de la boulangerie", correct: false, why: "Jargon managérial/startup incompréhensible pour le cœur de métier d'un boulanger." },
+      { id: "b", text: "Conduire les fermentations au levain naturel : réaliser le pointage, le façonnage, l'apprêt, tout en respectant les temps de pousse", correct: true },
+    ],
+  },
+  {
+    id: "m3", slot: "Mission 3 — Cuisson",
+    versions: [
+      { id: "a", text: "Cuire au four à sole : maîtrise précise des températures, de la buée et des temps de cuisson selon les spécificités des produits", correct: true },
+      { id: "b", text: "Piloter la cuisson transversale des produits en coordination avec les équipes de vente pour garantir un réassort continu des vitrines", correct: false, why: "« Transversale » est du jargon inutile. La mission doit être technique, pas marketing." },
+    ],
+  },
+  {
+    id: "m4", slot: "Mission 4 — Hygiène et qualité",
+    versions: [
+      { id: "a", text: "Effectuer diverses tâches de nettoyage, d'entretien et d'hygiène de l'espace de travail, selon les plannings affichés dans le laboratoire", correct: false, why: "« Diverses tâches » est une expression fourre-tout qui masque la réalité de la mission." },
+      { id: "b", text: "Appliquer et faire respecter les normes HACCP : nettoyage rigoureux du fournil, traçabilité des matières, contrôle des températures", correct: true },
+    ],
+  },
+  {
+    id: "m5", slot: "Mission 5 — Transmission",
+    versions: [
+      { id: "a", text: "Accompagner nos apprentis dans l'acquisition des gestes techniques de base de la boulangerie (étapes de pétrissage et de façonnage)", correct: true },
+      { id: "b", text: "Manager les profils juniors de l'équipe, assurer leur montée en compétences globale et réaliser les entretiens individuels d'évaluation", correct: false, why: "Ceci correspond à une fiche de poste de manager/chef, pas de boulanger classique." },
+    ],
+  },
+];
+
+const PROFIL_ITEMS = [
+  { id: "c1", text: "Diplôme de niveau CAP Boulanger minimum", category: "indispensable" },
+  { id: "c2", text: "Excellente maîtrise du four à sole et du levain naturel", category: "indispensable" },
+  { id: "c3", text: "Candidat(e) de langue maternelle française (natif)", category: "interdit", fix: "Maîtrise du français oral et écrit" },
+  { id: "c4", text: "Connaissance pointue des normes d'hygiène HACCP", category: "indispensable" },
+  { id: "c5", text: "Expérience préalable en pâtisserie boulangère (viennoiseries)", category: "apprecie" },
+  { id: "c6", text: "Excellente présentation et apparence soignée exigées", category: "interdit", fix: "Sens du contact client et savoir-être" },
+  { id: "c7", text: "Sensibilité affirmée aux circuits courts et aux produits bio", category: "apprecie" },
+  { id: "c8", text: "Grande rigueur, ponctualité infaillible et fort esprit d'équipe", category: "indispensable" },
+  { id: "c9", text: "Profil jeune, dynamique, sportif et très résistant au stress", category: "interdit", fix: "Personnalité enthousiaste, proactive et endurante" },
+  { id: "c10", text: "Maîtrise d'un outil ERP de gestion des stocks (type Notilia)", category: "apprecie" },
+];
+
+const CONDITIONS_FIELDS = [
+  {
+    id: "salaire", label: "Rémunération",
+    options: [
+      { id: "a", text: "Rémunération très attractive et évolutive, à définir précisément selon votre profil, vos compétences et votre implication", correct: false, why: "Le fameux « selon profil » fait fuir les candidats. Il faut donner une fourchette claire." },
+      { id: "b", text: "Entre 24 000 et 28 000 € brut annuel selon expérience préalable + prime mensuelle de panification sur objectifs", correct: true, why: "Fourchette claire, avantage spécifique inclus. Transparence totale dès la lecture." },
+    ],
+  },
+  {
+    id: "horaires", label: "Horaires et contraintes",
+    options: [
+      { id: "a", text: "Disponibilité totale et flexibilité requises, travail très régulier les week-ends, et présence indispensable lors des jours fériés", correct: false, why: "« Disponibilité totale » est source de stress, vague et potentiellement discriminant (famille)." },
+      { id: "b", text: "Horaires fixes : 4h00 – 12h00, du mardi au samedi. Les jours fériés sont travaillés selon un roulement défini (environ 6/an)", correct: true, why: "Horaires extrêmement précis et chiffrés. Le candidat peut projeter son organisation de vie." },
+    ],
+  },
+  {
+    id: "avantages", label: "Avantages",
+    options: [
+      { id: "a", text: "Mutuelle prise en charge à 60%, pain offert chaque jour, forfait mobilité durable (vélo), formation continue aux techniques bio", correct: true, why: "Des avantages concrets, quantifiables et surtout cohérents avec l'image RSE de la boulangerie." },
+      { id: "b", text: "Excellente ambiance de travail garantie, équipe jeune et très sympa, cadre de travail agréable en plein centre-ville", correct: false, why: "Ce ne sont pas de vrais avantages contractuels mais des affirmations subjectives invérifiables." },
+    ],
+  },
+  {
+    id: "processus", label: "Processus de recrutement",
+    options: [
+      { id: "a", text: "Envoyez-nous rapidement votre CV détaillé par email. Nous étudierons votre candidature et vous recontacterons si profil adéquat", correct: false, why: "Opaque. Le candidat ne connaît ni les étapes, ni les délais, ni le mode d'évaluation." },
+      { id: "b", text: "CV + LM à recrutement@fournil-halles.fr. Processus : présélection (3j) → entretien (45 min) → essai au fournil (1 mat.) → réponse (10j)", correct: true, why: "La transparence parfaite : contacts, durée de chaque étape et délai de réponse garanti." },
+    ],
+  },
+];
+
+// ═══════════════════════════════════════════════════
+// STYLES
+// ═══════════════════════════════════════════════════
+const C = {
+  bg: "#f8f9fb", white: "#ffffff", text: "#1e293b", textLight: "#64748b", textMuted: "#94a3b8",
+  accent: "#4338ca", accentLight: "#e0e7ff", accentSoft: "#eef2ff",
+  warm: "#b45309", warmBg: "#fffbeb",
+  ok: "#059669", okBg: "#ecfdf5", okBorder: "#a7f3d0",
+  err: "#dc2626", errBg: "#fef2f2", errBorder: "#fecaca",
+  border: "#e2e8f0", borderLight: "#f1f5f9",
+  shadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+};
+
+const btnP = {
+  padding: "11px 32px", background: C.accent, color: "#fff", border: "none",
+  borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer",
+  fontFamily: "'Plus Jakarta Sans',sans-serif", boxShadow: "0 2px 8px rgba(67,56,202,0.25)",
+  transition: "all 0.2s"
+};
+
+// ═══════════════════════════════════════════════════
+// SHARED COMPONENTS
+// ═══════════════════════════════════════════════════
+function Card({ children, style, onClick }) {
+  return (
+    <div onClick={onClick} style={{
+      background: C.white, border: `1.5px solid ${C.border}`, borderRadius: 14,
+      padding: "16px 20px", cursor: onClick ? "pointer" : "default", transition: "all 0.2s",
+      boxShadow: C.shadow, ...style
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function Badge({ children, color = C.accent }) {
+  return (
+    <span style={{
+      display: "inline-block", padding: "4px 12px", borderRadius: 999,
+      fontSize: 12, fontWeight: 600, background: `${color}15`, color, border: `1px solid ${color}30`
+    }}>
+      {children}
+    </span>
+  );
+}
+
+function StepDots({ steps, current }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 24, flexWrap: "wrap" }}>
+      {steps.map((s, i) => (
+        <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center",
+            justifyContent: "center", fontSize: 12, fontWeight: 700,
+            background: i < current ? C.ok : i === current ? C.accent : C.borderLight,
+            color: i <= current ? "#fff" : C.textMuted, transition: "all 0.3s"
+          }}>
+            {i < current ? "✓" : i + 1}
+          </div>
+          {i === current && <span style={{ fontSize: 12, fontWeight: 600, color: C.text }}>{s.label}</span>}
+          {i < steps.length - 1 && <div style={{ width: 16, height: 2, background: i < current ? C.ok : C.border, borderRadius: 2 }} />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// OptionPicker repensé : on ne montre plus la correction immédiatement !
+function OptionPicker({ options, selected, onSelect }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {options.map((opt) => {
+        const isSel = selected === opt.id;
+        let brd = isSel ? C.accent : C.border;
+        let bg = isSel ? C.accentSoft : C.white;
+
+        return (
+          <div key={opt.id} onClick={() => onSelect(opt.id)} style={{
+            padding: "12px 16px", borderRadius: 10, cursor: "pointer",
+            transition: "all 0.2s", border: `2px solid ${brd}`, background: bg
+          }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+              <div style={{
+                width: 20, height: 20, borderRadius: "50%", flexShrink: 0, marginTop: 1,
+                border: isSel ? "none" : `2px solid ${C.border}`,
+                background: isSel ? C.accent : "transparent",
+                display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700
+              }}>
+                {isSel ? "●" : ""}
+              </div>
+              <span style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>{opt.text}</span>
             </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
-            <!-- Slide 1 : Boulanger qualifié -->
-            <div class="slide situation-slide" data-slide="1">
-                <div class="situation-panel">
-                    <span class="situation-badge">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        Situation 1 / 5
-                    </span>
-                    <h3 class="situation-title">Recrutement d'un Boulanger qualifié</h3>
-                    <div class="situation-details">
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Nature du poste</h4>
-                                <p>CDI - CAP/BP Boulanger exigé - 3 ans d'expérience minimum</p>
-                            </div>
-                        </div>
-                        <div class="detail-item urgency-high">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Urgence</h4>
-                                <p><strong style="color: var(--erreur);">Élevée</strong> - Départ soudain, poste à pourvoir sous 2 semaines</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Bassin d'emploi</h4>
-                                <p>Ville moyenne (60 000 hab.) - Zone semi-rurale - Plusieurs boulangeries concurrentes</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Contexte</h4>
-                                <p>Boulangerie Ange à fort volume - Équipe de 4 boulangers à compléter</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="choices-panel">
-                    <p class="choices-instruction">Sélectionnez les <strong>2 ou 3 canaux</strong> les plus pertinents pour cette situation :</p>
-                    <div class="choices-grid">
-                        <button class="choice-btn" data-choice="interim" data-optimal="true" data-hint="✓ Idéal pour l'urgence, vivier de boulangers disponibles">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                            </div>
-                            <span class="choice-label">Agences d'intérim</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="francetravail" data-optimal="true" data-hint="✓ Vivier local, profils métiers artisanaux">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10z"/></svg>
-                            </div>
-                            <span class="choice-label">France Travail</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="reseauange" data-correct="true" data-hint="✓ Réseau interne Ange, mobilité possible">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                            </div>
-                            <span class="choice-label">Réseau interne Ange</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="linkedin" data-hint="✗ Peu adapté aux profils artisanaux">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                            </div>
-                            <span class="choice-label">LinkedIn</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="cabinet" data-hint="✗ Trop coûteux et long pour ce poste">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                            </div>
-                            <span class="choice-label">Cabinet de recrutement</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="ecoles" data-hint="✗ Inadapté : profil expérimenté recherché">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-                            </div>
-                            <span class="choice-label">CFA / Écoles</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                    </div>
-                    <div class="validate-section">
-                        <button class="validate-btn" onclick="validateChoices(1)" disabled>Valider mes choix</button>
-                    </div>
-                    <div class="feedback-panel" id="feedback-1">
-                        <div class="feedback-header">
-                            <div class="feedback-icon">
-                                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                            </div>
-                            <span class="feedback-title">Analyse de vos choix</span>
-                        </div>
-                        <p class="feedback-text">
-                            <strong>Canaux optimaux :</strong> L'<strong>intérim</strong> répond à l'urgence avec un vivier de boulangers disponibles immédiatement. 
-                            <strong>France Travail</strong> offre un bon vivier local de profils artisanaux. Le <strong>réseau interne Ange</strong> permet d'identifier 
-                            des collaborateurs en mobilité. LinkedIn et les cabinets sont inadaptés pour ce profil métier.
-                        </p>
-                    </div>
-                </div>
-            </div>
+// ═══════════════════════════════════════════════════
+// INTRO
+// ═══════════════════════════════════════════════════
+function IntroPhase({ onNext }) {
+  return (
+    <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
+      <div style={{ width: 80, height: 80, borderRadius: 20, margin: "0 auto 20px", background: C.warmBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, boxShadow: C.shadow }}>🥖</div>
+      <h1 style={{ fontFamily: "'Fraunces',serif", fontSize: 32, fontWeight: 700, color: C.text, marginBottom: 10, lineHeight: 1.2 }}>Rédiger une annonce d'emploi</h1>
+      <p style={{ color: C.textLight, fontSize: 14, marginBottom: 6 }}>Compétence visée : <strong style={{ color: C.text }}>rédiger une annonce claire, non discriminante et attractive</strong></p>
+      <p style={{ color: C.textMuted, fontSize: 14, lineHeight: 1.7, marginBottom: 32, maxWidth: 520, margin: "0 auto 32px" }}>
+        Vous êtes responsable RH de la boulangerie <strong style={{ color: C.text }}>Le Fournil des Halles</strong> à Rennes. Vous devez recruter un(e) boulanger(ère) en CDI.
+      </p>
 
-            <!-- Slide 2 : Vendeurs pour ouverture -->
-            <div class="slide situation-slide" data-slide="2">
-                <div class="situation-panel">
-                    <span class="situation-badge">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        Situation 2 / 5
-                    </span>
-                    <h3 class="situation-title">Recrutement de 8 Vendeurs/Vendeuses</h3>
-                    <div class="situation-details">
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Nature du poste</h4>
-                                <p>CDI temps plein et partiel - Débutants acceptés - Formation prévue</p>
-                            </div>
-                        </div>
-                        <div class="detail-item urgency-medium">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Urgence</h4>
-                                <p><strong style="color: var(--attention);">Moyenne</strong> - Ouverture d'une nouvelle boulangerie dans 6 semaines</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Bassin d'emploi</h4>
-                                <p>Zone commerciale périurbaine - Fort taux de chômage local - Bonne desserte transports</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Contexte</h4>
-                                <p>Nouvelle implantation Ange - Besoin de constituer toute l'équipe de vente</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="choices-panel">
-                    <p class="choices-instruction">Sélectionnez les <strong>2 ou 3 canaux</strong> les plus pertinents pour cette situation :</p>
-                    <div class="choices-grid">
-                        <button class="choice-btn" data-choice="francetravail" data-optimal="true" data-hint="✓ Volume, profils locaux, accompagnement MRS/POEI">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10z"/></svg>
-                            </div>
-                            <span class="choice-label">France Travail</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="joblocal" data-optimal="true" data-hint="✓ Visibilité locale, rencontre directe">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            </div>
-                            <span class="choice-label">Forums emploi locaux</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="facebook" data-correct="true" data-hint="✓ Groupes locaux, touche les candidats du quartier">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                            </div>
-                            <span class="choice-label">Facebook local</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="vitrine" data-correct="true" data-hint="✓ Affichage sur le futur point de vente">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>
-                            </div>
-                            <span class="choice-label">Affichage vitrine</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="linkedin" data-hint="✗ Inadapté pour ce type de profils">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                            </div>
-                            <span class="choice-label">LinkedIn</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="cabinet" data-hint="✗ Disproportionné pour ce niveau">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                            </div>
-                            <span class="choice-label">Cabinet de recrutement</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                    </div>
-                    <div class="validate-section">
-                        <button class="validate-btn" onclick="validateChoices(2)" disabled>Valider mes choix</button>
-                    </div>
-                    <div class="feedback-panel" id="feedback-2">
-                        <div class="feedback-header">
-                            <div class="feedback-icon">
-                                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                            </div>
-                            <span class="feedback-title">Analyse de vos choix</span>
-                        </div>
-                        <p class="feedback-text">
-                            <strong>Canaux optimaux :</strong> <strong>France Travail</strong> est incontournable pour le volume et peut proposer des dispositifs (MRS, POEI). 
-                            Les <strong>forums emploi locaux</strong> et <strong>Facebook</strong> permettent de toucher les habitants du quartier. 
-                            L'<strong>affichage vitrine</strong> sur le futur magasin attire les candidats de proximité.
-                        </p>
-                    </div>
-                </div>
-            </div>
+      <div style={{ display: "flex", gap: 12, marginBottom: 32, textAlign: "left" }}>
+        {[
+          { icon: "🔍", title: "Tri express", desc: "Classez 8 formulations : acceptables ou discriminantes" },
+          { icon: "🏗️", title: "Construction", desc: "Assemblez l'annonce complète en 5 étapes" },
+          { icon: "📋", title: "Bilan détaillé", desc: "Visualisez votre score et la correction détaillée à la fin" },
+        ].map((item) => (
+          <Card key={item.title} style={{ flex: 1, padding: "14px 16px" }}>
+            <div style={{ fontSize: 22, marginBottom: 6 }}>{item.icon}</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 4 }}>{item.title}</div>
+            <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.5 }}>{item.desc}</div>
+          </Card>
+        ))}
+      </div>
 
-            <!-- Slide 3 : Responsable de magasin -->
-            <div class="slide situation-slide" data-slide="3">
-                <div class="situation-panel">
-                    <span class="situation-badge">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        Situation 3 / 5
-                    </span>
-                    <h3 class="situation-title">Recrutement d'un Responsable de magasin</h3>
-                    <div class="situation-details">
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Nature du poste</h4>
-                                <p>CDI Cadre - Bac+2 commerce minimum - 5 ans expérience management retail</p>
-                            </div>
-                        </div>
-                        <div class="detail-item urgency-low">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Urgence</h4>
-                                <p><strong style="color: var(--succes);">Faible</strong> - Ouverture prévue dans 4 mois, temps pour bien recruter</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Bassin d'emploi</h4>
-                                <p>Grande agglomération (400 000 hab.) - Nombreuses enseignes de retail présentes</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Contexte</h4>
-                                <p>Poste clé - Sera en charge du recrutement et management de 12 personnes</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="choices-panel">
-                    <p class="choices-instruction">Sélectionnez les <strong>2 ou 3 canaux</strong> les plus pertinents pour cette situation :</p>
-                    <div class="choices-grid">
-                        <button class="choice-btn" data-choice="linkedin" data-optimal="true" data-hint="✓ Profils managers retail, approche directe">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                            </div>
-                            <span class="choice-label">LinkedIn</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="reseauange" data-optimal="true" data-hint="✓ Promotion interne, connaissance de la culture Ange">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                            </div>
-                            <span class="choice-label">Promotion interne Ange</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="jobboard" data-correct="true" data-hint="✓ Indeed, HelloWork pour visibilité large">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
-                            </div>
-                            <span class="choice-label">Jobboards généralistes</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="interim" data-hint="✗ Inadapté pour un poste de management">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                            </div>
-                            <span class="choice-label">Intérim</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="facebook" data-hint="✗ Peu adapté pour ce niveau de poste">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                            </div>
-                            <span class="choice-label">Facebook</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="vitrine" data-hint="✗ Inadapté pour un profil cadre">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>
-                            </div>
-                            <span class="choice-label">Affichage vitrine</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                    </div>
-                    <div class="validate-section">
-                        <button class="validate-btn" onclick="validateChoices(3)" disabled>Valider mes choix</button>
-                    </div>
-                    <div class="feedback-panel" id="feedback-3">
-                        <div class="feedback-header">
-                            <div class="feedback-icon">
-                                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                            </div>
-                            <span class="feedback-title">Analyse de vos choix</span>
-                        </div>
-                        <p class="feedback-text">
-                            <strong>Canaux optimaux :</strong> <strong>LinkedIn</strong> permet de cibler les managers retail expérimentés. 
-                            La <strong>promotion interne</strong> valorise les talents Ange qui connaissent déjà la culture. 
-                            Les <strong>jobboards</strong> (Indeed, HelloWork) apportent une visibilité complémentaire.
-                        </p>
-                    </div>
-                </div>
-            </div>
+      <Card style={{ textAlign: "left", background: C.warmBg, border: "1px solid #fde68a", marginBottom: 32 }}>
+        <div style={{ fontSize: 13, color: C.warm, fontWeight: 700, marginBottom: 6 }}>📌 Contexte — {BAKERY_CONTEXT.nom}</div>
+        <p style={{ fontSize: 13, color: "#78350f", lineHeight: 1.7, margin: 0 }}>{BAKERY_CONTEXT.desc}</p>
+      </Card>
 
-            <!-- Slide 4 : Pâtissier expérimenté -->
-            <div class="slide situation-slide" data-slide="4">
-                <div class="situation-panel">
-                    <span class="situation-badge">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        Situation 4 / 5
-                    </span>
-                    <h3 class="situation-title">Recrutement d'un Pâtissier expérimenté</h3>
-                    <div class="situation-details">
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Nature du poste</h4>
-                                <p>CDI - BTM/BM Pâtissier - 5+ ans d'expérience - Maîtrise entremets et viennoiseries</p>
-                            </div>
-                        </div>
-                        <div class="detail-item urgency-medium">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Urgence</h4>
-                                <p><strong style="color: var(--attention);">Moyenne</strong> - Développement gamme pâtisserie dans 2 mois</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Bassin d'emploi</h4>
-                                <p>Zone rurale (20 000 hab.) - Peu de pâtisseries artisanales - Marché tendu</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Contexte</h4>
-                                <p>Profil rare et recherché - Concurrence des grandes villes proches</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="choices-panel">
-                    <p class="choices-instruction">Sélectionnez les <strong>2 ou 3 canaux</strong> les plus pertinents pour cette situation :</p>
-                    <div class="choices-grid">
-                        <button class="choice-btn" data-choice="reseauange" data-optimal="true" data-hint="✓ Mobilité interne, pâtissiers du réseau Ange">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                            </div>
-                            <span class="choice-label">Réseau interne Ange</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="jobboardmetier" data-optimal="true" data-hint="✓ Sites spécialisés métiers de bouche">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
-                            </div>
-                            <span class="choice-label">Sites métiers de bouche</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="francetravail" data-correct="true" data-hint="✓ À élargir géographiquement vu la rareté">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10z"/></svg>
-                            </div>
-                            <span class="choice-label">France Travail (élargi)</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="ecoles" data-hint="✗ Inadapté : profil expérimenté recherché">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-                            </div>
-                            <span class="choice-label">CFA Pâtisserie</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="linkedin" data-hint="✗ Peu de pâtissiers artisanaux sur LinkedIn">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                            </div>
-                            <span class="choice-label">LinkedIn</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="vitrine" data-hint="✗ Zone rurale = peu de passage qualifié">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>
-                            </div>
-                            <span class="choice-label">Affichage vitrine</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                    </div>
-                    <div class="validate-section">
-                        <button class="validate-btn" onclick="validateChoices(4)" disabled>Valider mes choix</button>
-                    </div>
-                    <div class="feedback-panel" id="feedback-4">
-                        <div class="feedback-header">
-                            <div class="feedback-icon">
-                                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                            </div>
-                            <span class="feedback-title">Analyse de vos choix</span>
-                        </div>
-                        <p class="feedback-text">
-                            <strong>Canaux optimaux :</strong> Le <strong>réseau interne Ange</strong> peut révéler des pâtissiers souhaitant changer de région. 
-                            Les <strong>sites métiers de bouche</strong> (L'Hôtellerie-Restauration, etc.) touchent ce public spécialisé. 
-                            <strong>France Travail</strong> avec un périmètre élargi permet de capter des candidats des villes voisines.
-                        </p>
-                    </div>
-                </div>
-            </div>
+      <button onClick={onNext} style={{ ...btnP, padding: "14px 48px", fontSize: 16 }}>Commencer l'exercice →</button>
+    </div>
+  );
+}
 
-            <!-- Slide 5 : Apprenti boulanger -->
-            <div class="slide situation-slide" data-slide="5">
-                <div class="situation-panel">
-                    <span class="situation-badge">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        Situation 5 / 5
-                    </span>
-                    <h3 class="situation-title">Recrutement d'un Apprenti Boulanger</h3>
-                    <div class="situation-details">
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Nature du poste</h4>
-                                <p>Contrat d'apprentissage - CAP Boulanger - Durée 24 mois</p>
-                            </div>
-                        </div>
-                        <div class="detail-item urgency-low">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Urgence</h4>
-                                <p><strong style="color: var(--succes);">Faible</strong> - Rentrée de septembre, 5 mois pour recruter</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Bassin d'emploi</h4>
-                                <p>Ville moyenne avec CFA des métiers de bouche à proximité</p>
-                            </div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                            </div>
-                            <div class="detail-content">
-                                <h4>Contexte</h4>
-                                <p>Politique Ange de formation des futurs talents - Maître d'apprentissage disponible</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="choices-panel">
-                    <p class="choices-instruction">Sélectionnez les <strong>2 ou 3 canaux</strong> les plus pertinents pour cette situation :</p>
-                    <div class="choices-grid">
-                        <button class="choice-btn" data-choice="cfa" data-optimal="true" data-hint="✓ Contact direct CFA, vivier de candidats motivés">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-                            </div>
-                            <span class="choice-label">CFA / Écoles métiers</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="1jeune1solution" data-optimal="true" data-hint="✓ Plateforme dédiée alternance">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
-                            </div>
-                            <span class="choice-label">1jeune1solution</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="salons" data-correct="true" data-hint="✓ Salons alternance, rencontre directe">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                            </div>
-                            <span class="choice-label">Salons de l'alternance</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="cabinet" data-hint="✗ Totalement disproportionné">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                            </div>
-                            <span class="choice-label">Cabinet de recrutement</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="linkedin" data-hint="✗ Inadapté pour les jeunes en alternance">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                            </div>
-                            <span class="choice-label">LinkedIn</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                        <button class="choice-btn" data-choice="interim" data-hint="✗ L'intérim ne gère pas l'alternance">
-                            <div class="choice-icon">
-                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                            </div>
-                            <span class="choice-label">Intérim</span>
-                            <span class="choice-hint"></span>
-                        </button>
-                    </div>
-                    <div class="validate-section">
-                        <button class="validate-btn" onclick="validateChoices(5)" disabled>Valider mes choix</button>
-                    </div>
-                    <div class="feedback-panel" id="feedback-5">
-                        <div class="feedback-header">
-                            <div class="feedback-icon">
-                                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                            </div>
-                            <span class="feedback-title">Analyse de vos choix</span>
-                        </div>
-                        <p class="feedback-text">
-                            <strong>Canaux optimaux :</strong> Le <strong>CFA local</strong> est la voie royale : contact direct avec les responsables de formation et les jeunes en recherche. 
-                            <strong>1jeune1solution</strong> est la plateforme de référence pour l'alternance. 
-                            Les <strong>salons de l'alternance</strong> permettent de rencontrer directement les candidats et leurs familles.
-                        </p>
-                    </div>
-                </div>
-            </div>
+// ═══════════════════════════════════════════════════
+// TRI EXPRESS (Immédiat)
+// ═══════════════════════════════════════════════════
+function TriPhase({ onNext, score, setScore }) {
+  const [cur, setCur] = useState(0);
+  const [ans, setAns] = useState(null);
 
-            <!-- Slide 6 : Résultats -->
-            <div class="slide result-slide" data-slide="6">
-                <div class="result-icon">
-                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                </div>
-                <h2 class="result-title">Activité terminée !</h2>
-                <p class="result-score" id="final-score">0/5</p>
-                <p class="result-text" id="result-message">Vous avez analysé les 5 situations de recrutement.</p>
-                <div class="result-summary">
-                    <div class="summary-card">
-                        <h4>Situations analysées</h4>
-                        <p class="value">5</p>
-                    </div>
-                    <div class="summary-card">
-                        <h4>Choix optimaux identifiés</h4>
-                        <p class="value" id="optimal-count">0</p>
-                    </div>
-                </div>
-                <button class="restart-btn" onclick="restartActivity()">Recommencer l'activité</button>
+  const item = TRI_ITEMS[cur];
+  const done = ans !== null;
+  const ok = ans === item.bad;
+
+  const pick = (v) => {
+    if (done) return;
+    setAns(v);
+    if (v === item.bad) setScore((s) => s + 1);
+  };
+
+  const next = () => {
+    if (cur < TRI_ITEMS.length - 1) {
+      setCur((c) => c + 1);
+      setAns(null);
+    } else {
+      onNext();
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: 640, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <div>
+          <h2 style={{ fontFamily: "'Fraunces',serif", color: C.text, fontSize: 22, margin: 0 }}>Tri express</h2>
+          <p style={{ color: C.textMuted, fontSize: 13, margin: "4px 0 0" }}>Cette formulation peut-elle figurer dans une annonce ?</p>
+        </div>
+        <Badge>{cur + 1} / {TRI_ITEMS.length}</Badge>
+      </div>
+
+      <Card style={{ marginBottom: 20, background: C.accentSoft, border: `1px solid ${C.accentLight}` }}>
+        <div style={{ fontSize: 17, color: C.text, lineHeight: 1.7, fontWeight: 500, padding: "8px 0", textAlign: "center" }}>
+          « {item.text} »
+        </div>
+      </Card>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 8 }}>
+        {[
+          { val: false, label: "✅ Acceptable", sub: "Peut figurer dans l'annonce", goodC: C.ok },
+          { val: true, label: "⚠️ Discriminante", sub: "À reformuler", goodC: C.err },
+        ].map((opt) => {
+          const isSel = ans === opt.val;
+          const isRight = done && opt.val === item.bad;
+          const isWrong = done && isSel && !ok;
+          let brd = C.border, bg = C.white;
+
+          if (isRight) { brd = opt.goodC; bg = opt.val ? C.errBg : C.okBg; }
+          if (isWrong) { brd = C.err; bg = C.errBg; }
+
+          return (
+            <div key={String(opt.val)} onClick={() => pick(opt.val)} style={{
+              padding: "18px 16px", borderRadius: 12, textAlign: "center", cursor: done ? "default" : "pointer",
+              transition: "all 0.2s", opacity: done && !isRight && !isWrong ? 0.4 : 1, border: `2px solid ${brd}`,
+              background: bg, boxShadow: C.shadow
+            }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: C.text, marginBottom: 4 }}>{opt.label}</div>
+              <div style={{ fontSize: 12, color: C.textMuted }}>{opt.sub}</div>
             </div>
+          );
+        })}
+      </div>
+
+      {done && (
+        <div style={{ animation: "fadeSlideIn 0.3s" }}>
+          <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 10, fontSize: 13, lineHeight: 1.6, background: ok ? C.okBg : C.errBg, border: `1px solid ${ok ? C.okBorder : C.errBorder}`, color: ok ? "#065f46" : "#991b1b" }}>
+            <span style={{ fontWeight: 700, marginRight: 6 }}>{ok ? "✓" : "✗"}</span>
+            {item.bad ? <>Catégorie : <strong>{item.cat}</strong>. Reformulation : « {item.fix} »</> : "Cette formulation est factuelle et légale."}
+          </div>
+          <div style={{ textAlign: "right", marginTop: 16 }}>
+            <button onClick={next} style={btnP}>{cur < TRI_ITEMS.length - 1 ? "Suivant →" : "Construire l'annonce →"}</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// CONSTRUCTION WRAPPER
+// ═══════════════════════════════════════════════════
+function ConstructionPhase({ onNext, cAns, setCAns }) {
+  const [step, setStep] = useState(0);
+
+  const nextStep = () => {
+    if (step < STEPS.length - 1) setStep(s => s + 1);
+    else onNext();
+  };
+
+  return (
+    <div style={{ maxWidth: 720, margin: "0 auto" }}>
+      <div style={{ marginBottom: 8 }}>
+        <h2 style={{ fontFamily: "'Fraunces',serif", color: C.text, fontSize: 22, margin: "0 0 4px" }}>🏗️ Construisez votre annonce</h2>
+        <p style={{ color: C.textMuted, fontSize: 13, margin: "0 0 16px" }}>Sélectionnez les meilleures propositions. La correction s'affichera à la fin.</p>
+      </div>
+      <StepDots steps={STEPS} current={step} />
+
+      <div style={{ display: step === 0 ? "block" : "none" }}>
+        <EnteteStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+      <div style={{ display: step === 1 ? "block" : "none" }}>
+        <PresentationStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+      <div style={{ display: step === 2 ? "block" : "none" }}>
+        <MissionsStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+      <div style={{ display: step === 3 ? "block" : "none" }}>
+        <ProfilStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+      <div style={{ display: step === 4 ? "block" : "none" }}>
+        <ConditionsStep cAns={cAns} setCAns={setCAns} onNext={nextStep} />
+      </div>
+    </div>
+  );
+}
+
+// ─── En-tête ────────────────────────────────────────
+function EnteteStep({ cAns, setCAns, onNext }) {
+  const ans = cAns.entete;
+  const setAns = (id, val) => setCAns(p => ({ ...p, entete: { ...p.entete, [id]: val } }));
+  const allDone = ENTETE_FIELDS.every(f => ans[f.id]);
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 En-tête — Mentions obligatoires</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>Complétez chaque champ en choisissant la formulation correcte.</p>
+      </Card>
+      {ENTETE_FIELDS.map(f => (
+        <div key={f.id} style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 8 }}>{f.label}</div>
+          <OptionPicker options={f.options} selected={ans[f.id]} onSelect={(val) => setAns(f.id, val)} />
+        </div>
+      ))}
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={!allDone} style={{ ...btnP, opacity: allDone ? 1 : 0.4 }}>Étape suivante →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Présentation ───────────────────────────────────
+function PresentationStep({ cAns, setCAns, onNext }) {
+  const sel = cAns.pres;
+  const toggle = (id) => setCAns(p => ({ ...p, pres: p.pres.includes(id) ? p.pres.filter(x => x !== id) : [...p.pres, id] }));
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 Qui sommes-nous ?</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>Sélectionnez uniquement les éléments factuels et crédibles. Rejetez le greenwashing.</p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+        {PRESENTATION_BLOCKS.map(b => {
+          const isSel = sel.includes(b.id);
+          return (
+            <div key={b.id} onClick={() => toggle(b.id)} style={{
+              padding: "14px 18px", borderRadius: 12, cursor: "pointer", transition: "all 0.2s",
+              border: `2px solid ${isSel ? C.accent : C.border}`, background: isSel ? C.accentSoft : C.white
+            }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <div style={{
+                  width: 22, height: 22, borderRadius: 6, flexShrink: 0, marginTop: 1, border: isSel ? "none" : `2px solid ${C.border}`,
+                  background: isSel ? C.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 700
+                }}>{isSel ? "✓" : ""}</div>
+                <span style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>{b.text}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={sel.length === 0} style={{ ...btnP, opacity: sel.length ? 1 : 0.4 }}>Étape suivante →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Missions ───────────────────────────────────────
+function MissionsStep({ cAns, setCAns, onNext }) {
+  const ans = cAns.missions;
+  const setAns = (id, val) => setCAns(p => ({ ...p, missions: { ...p.missions, [id]: val } }));
+  const allDone = MISSIONS_BUILD.every(m => ans[m.id]);
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 Vos missions</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>Pour chaque mission, choisissez la formulation la plus concrète et objective.</p>
+      </Card>
+      {MISSIONS_BUILD.map(m => (
+        <div key={m.id} style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: C.accent, marginBottom: 8 }}>{m.slot}</div>
+          <OptionPicker options={m.versions} selected={ans[m.id]} onSelect={(val) => setAns(m.id, val)} />
+        </div>
+      ))}
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={!allDone} style={{ ...btnP, opacity: allDone ? 1 : 0.4 }}>Étape suivante →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Profil (Nouvelle UI de "peinture") ─────────────────────────────────────────
+function ProfilStep({ cAns, setCAns, onNext }) {
+  const pl = cAns.profil;
+  const setPl = (id, cat) => setCAns(p => ({ ...p, profil: { ...p.profil, [id]: cat } }));
+  const [activeTool, setActiveTool] = useState(null);
+
+  const cats = [
+    { id: "indispensable", label: "Indispensable", color: C.accent, bg: C.accentSoft },
+    { id: "apprecie", label: "Apprécié", color: C.warm, bg: C.warmBg },
+    { id: "interdit", label: "À supprimer", color: C.err, bg: C.errBg },
+  ];
+
+  const allPlaced = PROFIL_ITEMS.every(i => pl[i.id]);
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 Profil recherché</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>
+          1. Cliquez sur l'une des 3 bulles ci-dessous pour la sélectionner.<br />
+          2. Cliquez ensuite sur les critères pour leur appliquer ce choix.
+        </p>
+      </Card>
+
+      {/* Toolbar */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", justifyContent: "center", padding: "10px", background: "#fff", borderRadius: 12, border: `1px solid ${C.border}` }}>
+        {cats.map(c => {
+          const isActive = activeTool === c.id;
+          return (
+            <button key={c.id} onClick={() => setActiveTool(isActive ? null : c.id)} style={{
+              padding: "8px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600, border: `2px solid ${isActive ? c.color : "transparent"}`,
+              background: isActive ? c.color : c.bg, color: isActive ? "#fff" : c.color, cursor: "pointer", transition: "all 0.2s", transform: isActive ? "scale(1.05)" : "scale(1)"
+            }}>
+              {c.label} {isActive && "🖌️"}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+        {PROFIL_ITEMS.map(item => {
+          const cat = cats.find(c => c.id === pl[item.id]);
+          return (
+            <div key={item.id} onClick={() => activeTool && setPl(item.id, activeTool)} style={{
+              padding: "12px 16px", borderRadius: 10, cursor: activeTool ? "pointer" : "default", transition: "all 0.2s",
+              border: `2px solid ${cat ? `${cat.color}60` : C.border}`, background: cat ? `${cat.color}08` : C.white,
+              display: "flex", alignItems: "center", justifyContent: "space-between"
+            }}>
+              <span style={{ fontSize: 14, color: C.text }}>{item.text}</span>
+              <span style={{
+                padding: "4px 12px", borderRadius: 999, fontSize: 11, fontWeight: 700,
+                background: cat ? `${cat.color}15` : C.borderLight, color: cat ? cat.color : C.textMuted,
+                border: `1px solid ${cat ? `${cat.color}30` : C.border}`, minWidth: 90, textAlign: "center"
+              }}>
+                {cat ? cat.label : "À classer"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={!allPlaced} style={{ ...btnP, opacity: allPlaced ? 1 : 0.4 }}>Étape suivante →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Conditions ─────────────────────────────────────
+function ConditionsStep({ cAns, setCAns, onNext }) {
+  const ans = cAns.conditions;
+  const setAns = (id, val) => setCAns(p => ({ ...p, conditions: { ...p.conditions, [id]: val } }));
+  const allDone = CONDITIONS_FIELDS.every(f => ans[f.id]);
+
+  return (
+    <div className="fadeSlide">
+      <Card style={{ marginBottom: 20, background: C.warmBg, border: "1px solid #fde68a" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.warm, marginBottom: 4 }}>📌 Conditions, avantages & candidature</div>
+        <p style={{ fontSize: 13, color: "#78350f", margin: 0, lineHeight: 1.6 }}>Dernière partie. Transparence, précision et cohérence RSE.</p>
+      </Card>
+      {CONDITIONS_FIELDS.map(f => (
+        <div key={f.id} style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 8 }}>{f.label}</div>
+          <OptionPicker options={f.options} selected={ans[f.id]} onSelect={(val) => setAns(f.id, val)} />
+        </div>
+      ))}
+      <div style={{ textAlign: "right" }}>
+        <button onClick={onNext} disabled={!allDone} style={{ ...btnP, opacity: allDone ? 1 : 0.4 }}>Voir le bilan →</button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// BILAN (Avec correction détaillée)
+// ═══════════════════════════════════════════════════
+function BilanPhase({ scoreTri, cAns, onRestart }) {
+  const [tab, setTab] = useState("score"); // 'score', 'correction', 'rules'
+
+  // Calcul du score de la phase Construction
+  let scoreConst = 0;
+  // Entete (max 8)
+  ENTETE_FIELDS.forEach(f => { if (f.options.find(o => o.id === cAns.entete[f.id])?.correct) scoreConst += 2; });
+  // Pres (max 6)
+  const presGood = PRESENTATION_BLOCKS.filter(b => b.good).map(b => b.id);
+  const presPts = Math.max(0, cAns.pres.filter(id => presGood.includes(id)).length * 2 - cAns.pres.filter(id => !presGood.includes(id)).length);
+  scoreConst += presPts;
+  // Missions (max 10)
+  MISSIONS_BUILD.forEach(m => { if (m.versions.find(v => v.id === cAns.missions[m.id])?.correct) scoreConst += 2; });
+  // Profil (max 10)
+  PROFIL_ITEMS.forEach(i => { if (cAns.profil[i.id] === i.category) scoreConst += 1; });
+  // Conditions (max 8)
+  CONDITIONS_FIELDS.forEach(f => { if (f.options.find(o => o.id === cAns.conditions[f.id])?.correct) scoreConst += 2; });
+
+  const maxConst = 42;
+  const total = scoreTri + scoreConst;
+  const max = 8 + maxConst;
+  const pct = Math.round((total / max) * 100);
+
+  const grade = pct >= 85 ? { label: "Expert(e) en rédaction", emoji: "🏆", color: "#b45309" }
+    : pct >= 65 ? { label: "Bon(ne) rédacteur(trice)", emoji: "🎯", color: C.ok }
+      : pct >= 40 ? { label: "En progression", emoji: "📈", color: C.warm }
+        : { label: "À approfondir", emoji: "📚", color: C.err };
+
+  // Helper pour afficher une erreur de correction
+  const CorrectionItem = ({ title, status, desc, why }) => (
+    <div style={{ background: status ? C.okBg : C.errBg, border: `1px solid ${status ? C.okBorder : C.errBorder}`, padding: "12px 16px", borderRadius: 10, marginBottom: 12 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: status ? "#065f46" : "#991b1b", marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 13, color: C.text, marginBottom: why ? 6 : 0 }}>{desc}</div>
+      {why && <div style={{ fontSize: 12, color: status ? "#065f46" : "#991b1b", fontStyle: "italic", borderTop: `1px solid ${status ? C.okBorder : C.errBorder}`, paddingTop: 6, marginTop: 6 }}>{why}</div>}
+    </div>
+  );
+
+  return (
+    <div style={{ maxWidth: 700, margin: "0 auto" }}>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ fontSize: 56, marginBottom: 8 }}>{grade.emoji}</div>
+        <h2 style={{ fontFamily: "'Fraunces',serif", color: grade.color, fontSize: 26, marginBottom: 6 }}>{grade.label}</h2>
+        <p style={{ color: C.textMuted, fontSize: 15 }}>Score total : <strong style={{ color: C.text, fontSize: 18 }}>{total}</strong> / {max} <span style={{ marginLeft: 8 }}>({pct}%)</span></p>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 24 }}>
+        {[
+          { id: "score", label: "Mon Score" },
+          { id: "correction", label: "Correction détaillée" },
+          { id: "rules", label: "Les 5 règles d'or" }
+        ].map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            padding: "8px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer",
+            background: tab === t.id ? C.accent : C.borderLight, color: tab === t.id ? "#fff" : C.textMuted
+          }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "score" && (
+        <div className="fadeSlide">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
+            {[
+              { k: "tri", icon: "🔍", label: "Tri express", score: scoreTri, max: 8 },
+              { k: "const", icon: "🏗️", label: "Construction", score: scoreConst, max: maxConst }
+            ].map((item) => {
+              const p = Math.round((item.score / item.max) * 100);
+              return (
+                <Card key={item.k}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}><span style={{ fontSize: 22 }}>{item.icon}</span><span style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{item.label}</span></div>
+                  <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 6 }}>{item.score} / {item.max} points</div>
+                  <div style={{ width: "100%", background: C.borderLight, borderRadius: 999, height: 8, overflow: "hidden" }}>
+                    <div style={{ width: `${p}%`, height: "100%", background: p >= 70 ? C.ok : p >= 40 ? C.warm : C.err, borderRadius: 999 }} />
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+          <div style={{ textAlign: "center", marginTop: 40 }}>
+            <button onClick={() => setTab("correction")} style={{ ...btnP, background: C.white, color: C.accent, border: `2px solid ${C.accent}` }}>Voir mes erreurs →</button>
+          </div>
+        </div>
+      )}
+
+      {tab === "correction" && (
+        <div className="fadeSlide">
+          <Card style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: 16, color: C.text, margin: "0 0 16px" }}>En-tête</h3>
+            {ENTETE_FIELDS.map(f => {
+              const userOpt = f.options.find(o => o.id === cAns.entete[f.id]);
+              const correctOpt = f.options.find(o => o.correct);
+              const ok = userOpt?.correct;
+              return <CorrectionItem key={f.id} title={f.label} status={ok} desc={ok ? userOpt.text : <>Votre choix : {userOpt?.text || "Aucun"}<br />Attendu : {correctOpt.text}</>} why={userOpt?.why} />
+            })}
+          </Card>
+          <Card style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: 16, color: C.text, margin: "0 0 16px" }}>Missions</h3>
+            {MISSIONS_BUILD.map(m => {
+              const userOpt = m.versions.find(o => o.id === cAns.missions[m.id]);
+              const correctOpt = m.versions.find(o => o.correct);
+              const ok = userOpt?.correct;
+              return <CorrectionItem key={m.id} title={m.slot} status={ok} desc={ok ? userOpt.text : <>Votre choix : {userOpt?.text || "Aucun"}<br />Attendu : {correctOpt.text}</>} why={userOpt?.why} />
+            })}
+          </Card>
+          <Card style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: 16, color: C.text, margin: "0 0 16px" }}>Profil</h3>
+            {PROFIL_ITEMS.map(i => {
+              const userCat = cAns.profil[i.id];
+              const ok = userCat === i.category;
+              return <CorrectionItem key={i.id} title={i.text} status={ok} desc={ok ? `Bien classé dans : ${i.category}` : `Vous l'avez classé : ${userCat || "Non classé"} | Attendu : ${i.category}`} why={i.fix ? `Reformulation conseillée : ${i.fix}` : null} />
+            })}
+          </Card>
+        </div>
+      )}
+
+      {tab === "rules" && (
+        <div className="fadeSlide">
+          <Card style={{ background: C.warmBg, border: "1px solid #fde68a" }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: C.warm, marginBottom: 12 }}>📌 Les 5 règles d'or</div>
+            <div style={{ fontSize: 14, color: "#78350f", lineHeight: 1.8 }}>
+              {[
+                ["Sincérité = rétention", "une annonce alignée sur la réalité évite les départs précoces."],
+                ["Zéro discrimination", "chaque critère discriminant doit être remplacé par la compétence réelle visée."],
+                ["La RSE se prouve", "des faits chiffrés et vérifiables, jamais des slogans."],
+                ["Clarté = candidatures qualifiées", "missions précises, fourchette salariale, processus transparent."],
+                ["C'est la loi", "discrimination à l'embauche = jusqu'à 45 000 € d'amende et 3 ans d'emprisonnement."],
+              ].map(([t, d], i) => <p key={i} style={{ margin: "0 0 10px" }}><strong style={{ color: "#92400e" }}>{i + 1}. {t} :</strong> {d}</p>)}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      <div style={{ textAlign: "center", marginTop: 30, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
+        <button onClick={onRestart} style={{ padding: "8px 24px", borderRadius: 8, fontSize: 14, cursor: "pointer", background: C.borderLight, color: C.text, border: "none", fontWeight: 600 }}>🔄 Recommencer l'exercice</button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// MAIN (Navigation via Tabs)
+// ═══════════════════════════════════════════════════
+export default function App() {
+  const [phase, setPhase] = useState(0); // 0: Intro, 1: Tri, 2: Const, 3: Bilan
+
+  // États partagés pour persistance lors de la navigation
+  const [scoreTri, setScoreTri] = useState(0);
+  const [cAns, setCAns] = useState({
+    entete: {},
+    pres: [],
+    missions: {},
+    profil: {},
+    conditions: {}
+  });
+
+  const restart = () => {
+    setPhase(0);
+    setScoreTri(0);
+    setCAns({ entete: {}, pres: [], missions: {}, profil: {}, conditions: {} });
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Plus Jakarta Sans',sans-serif", color: C.text }}>
+      <style>{`
+         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+         .fadeSlide { animation: fadeSlideIn 0.4s forwards; }
+         @keyframes fadeSlideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+         * { box-sizing:border-box; }
+       `}</style>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 24px" }}>
+
+        {/* Navigation Tabs */}
+        {phase > 0 && (
+          <div style={{ marginBottom: 28 }}>
+            <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+              {PHASES.slice(1).map((p, i) => {
+                const stepIdx = i + 1; // 1, 2, 3
+                return (
+                  <div key={p.id} onClick={() => setPhase(stepIdx)} style={{
+                    fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 999, cursor: "pointer", transition: "all 0.2s",
+                    background: stepIdx === phase ? C.accent : C.borderLight,
+                    color: stepIdx === phase ? "#fff" : C.textMuted,
+                  }}>
+                    {p.label}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ width: "100%", background: C.borderLight, borderRadius: 999, height: 6, overflow: "hidden" }}>
+              <div style={{
+                width: `${Math.round((phase / (PHASES.length - 1)) * 100)}%`, height: "100%",
+                background: `linear-gradient(90deg,${C.accent},#818cf8)`, borderRadius: 999,
+                transition: "width 0.4s cubic-bezier(.4,0,.2,1)"
+              }} />
+            </div>
+          </div>
+        )}
+
+        {/* Container principal. On utilise 'display' au lieu de destruction conditionnelle pour conserver l'état de TriPhase et ConstructionPhase */}
+        <div style={{ display: phase === 0 ? "block" : "none" }}>
+          <IntroPhase onNext={() => setPhase(1)} />
+        </div>
+        <div style={{ display: phase === 1 ? "block" : "none" }}>
+          <TriPhase onNext={() => setPhase(2)} score={scoreTri} setScore={setScoreTri} />
+        </div>
+        <div style={{ display: phase === 2 ? "block" : "none" }}>
+          <ConstructionPhase onNext={() => setPhase(3)} cAns={cAns} setCAns={setCAns} />
+        </div>
+        <div style={{ display: phase === 3 ? "block" : "none" }}>
+          <BilanPhase scoreTri={scoreTri} cAns={cAns} onRestart={restart} />
         </div>
 
-        <nav class="navigation">
-            <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled>
-                <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-                Précédent
-            </button>
-            <div class="progress-section">
-                <span class="progress-label">Progression :</span>
-                <div class="progress-indicators">
-                    <div class="progress-dot active" data-dot="0"></div>
-                    <div class="progress-dot" data-dot="1"></div>
-                    <div class="progress-dot" data-dot="2"></div>
-                    <div class="progress-dot" data-dot="3"></div>
-                    <div class="progress-dot" data-dot="4"></div>
-                    <div class="progress-dot" data-dot="5"></div>
-                    <div class="progress-dot" data-dot="6"></div>
-                </div>
-                <div class="score-display" id="score-display" style="display: none;">
-                    <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                    <span id="current-score">0/5 optimaux</span>
-                </div>
-            </div>
-            <button class="nav-btn" id="next-btn" onclick="nextSlide()">
-                Suivant
-                <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-            </button>
-        </nav>
+      </div>
     </div>
-
-    <script>
-        let currentSlide = 0;
-        const totalSlides = 7;
-        const selections = {};
-        const validated = {};
-        let optimalChoices = 0;
-
-        function updateSlide() {
-            document.querySelectorAll('.slide').forEach(slide => slide.classList.remove('active'));
-            document.querySelector(`[data-slide="${currentSlide}"]`).classList.add('active');
-
-            document.querySelectorAll('.progress-dot').forEach((dot, index) => {
-                dot.classList.remove('active');
-                if (index === currentSlide) dot.classList.add('active');
-                if (validated[index]) dot.classList.add('completed');
-            });
-
-            document.getElementById('prev-btn').disabled = currentSlide === 0;
-            
-            const nextBtn = document.getElementById('next-btn');
-            const scoreDisplay = document.getElementById('score-display');
-            
-            if (currentSlide === 0 || currentSlide === 6) {
-                nextBtn.style.visibility = 'hidden';
-            } else {
-                nextBtn.style.visibility = 'visible';
-                nextBtn.disabled = !validated[currentSlide];
-            }
-
-            // Afficher le score après la première validation
-            if (Object.keys(validated).length > 0 && currentSlide > 0 && currentSlide < 6) {
-                scoreDisplay.style.display = 'flex';
-                document.getElementById('current-score').textContent = `${optimalChoices}/5 optimaux`;
-            } else if (currentSlide === 0) {
-                scoreDisplay.style.display = 'none';
-            }
-        }
-
-        function startActivity() {
-            currentSlide = 1;
-            updateSlide();
-        }
-
-        function nextSlide() {
-            if (currentSlide < totalSlides - 1) {
-                currentSlide++;
-                updateSlide();
-            }
-        }
-
-        function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateSlide();
-            }
-        }
-
-        function restartActivity() {
-            currentSlide = 0;
-            Object.keys(selections).forEach(key => delete selections[key]);
-            Object.keys(validated).forEach(key => delete validated[key]);
-            optimalChoices = 0;
-            
-            document.querySelectorAll('.choice-btn').forEach(btn => {
-                btn.classList.remove('selected', 'correct', 'incorrect', 'optimal', 'disabled');
-                btn.querySelector('.choice-hint').textContent = '';
-            });
-            
-            document.querySelectorAll('.feedback-panel').forEach(panel => panel.classList.remove('show'));
-            document.querySelectorAll('.validate-btn').forEach(btn => btn.disabled = true);
-            document.querySelectorAll('.progress-dot').forEach(dot => dot.classList.remove('completed'));
-            document.getElementById('score-display').style.display = 'none';
-            
-            updateSlide();
-        }
-
-        // Gestion des clics sur les choix
-        for (let i = 1; i <= 5; i++) {
-            selections[i] = [];
-            const slide = document.querySelector(`[data-slide="${i}"]`);
-            if (slide) {
-                const grid = slide.querySelector('.choices-grid');
-                grid.querySelectorAll('.choice-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        if (validated[i]) return;
-
-                        const choice = this.dataset.choice;
-                        
-                        if (this.classList.contains('selected')) {
-                            this.classList.remove('selected');
-                            selections[i] = selections[i].filter(c => c !== choice);
-                        } else if (selections[i].length < 3) {
-                            this.classList.add('selected');
-                            selections[i].push(choice);
-                        }
-
-                        const validateBtn = slide.querySelector('.validate-btn');
-                        validateBtn.disabled = selections[i].length < 2;
-                    });
-                });
-            }
-        }
-
-        function validateChoices(slideNum) {
-            if (validated[slideNum]) return;
-            validated[slideNum] = true;
-
-            const slide = document.querySelector(`[data-slide="${slideNum}"]`);
-            const grid = slide.querySelector('.choices-grid');
-            const feedbackPanel = document.getElementById(`feedback-${slideNum}`);
-            
-            let hasOptimalSelected = false;
-
-            grid.querySelectorAll('.choice-btn').forEach(btn => {
-                btn.classList.add('disabled');
-                const choice = btn.dataset.choice;
-                const isSelected = selections[slideNum].includes(choice);
-                const isOptimal = btn.dataset.optimal === 'true';
-                const isCorrect = btn.dataset.correct === 'true';
-
-                const hint = btn.querySelector('.choice-hint');
-                hint.textContent = btn.dataset.hint;
-
-                if (isOptimal) {
-                    btn.classList.add('optimal');
-                    if (isSelected) hasOptimalSelected = true;
-                } else if (isCorrect) {
-                    btn.classList.add('correct');
-                } else if (isSelected) {
-                    btn.classList.add('incorrect');
-                }
-                
-                btn.classList.remove('selected');
-            });
-
-            if (hasOptimalSelected) {
-                optimalChoices++;
-            }
-
-            feedbackPanel.classList.add('show');
-            
-            // Mettre à jour l'affichage du score
-            document.getElementById('score-display').style.display = 'flex';
-            document.getElementById('current-score').textContent = `${optimalChoices}/5 optimaux`;
-            
-            updateSlide();
-
-            // Dernière situation : préparer les résultats
-            if (slideNum === 5) {
-                document.getElementById('final-score').textContent = `${optimalChoices}/5`;
-                document.getElementById('optimal-count').textContent = optimalChoices;
-                
-                let message = '';
-                if (optimalChoices >= 4) {
-                    message = 'Excellent ! Vous maîtrisez parfaitement le choix des canaux de recrutement adaptés au contexte Boulangeries Ange.';
-                } else if (optimalChoices >= 2) {
-                    message = 'Bien ! Vous avez une bonne compréhension des canaux. Quelques ajustements sont possibles selon les contextes.';
-                } else {
-                    message = 'Continuez à vous exercer pour mieux adapter vos choix aux différents contextes de recrutement.';
-                }
-                document.getElementById('result-message').textContent = message;
-            }
-        }
-
-        updateSlide();
-    </script>
-</body>
-</html>
+  );
+}
